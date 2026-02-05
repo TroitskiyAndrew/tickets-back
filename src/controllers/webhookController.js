@@ -25,72 +25,72 @@ const handleWebhook = async (req, res) => {
       const reply_markup = cq.message.reply_markup;
       const [action, value] = data.split('=');
       const user = await dataService.getDocumentByQuery("users", { telegramId: cq.from.id });
-      let responseText = 'Спасибо'
-      if (action === 'acceptShareByPayer') {
-        const share = await dataService.getDocument("shares", value);
-        if (!share.confirmedByPayer) {
-          share.confirmedByPayer = true;
-          await sharesService.updateShare(share, user.id);
-        }
-        reply_markup.inline_keyboard[1] = [reply_markup.inline_keyboard[1][0]]
-        await axios.post(`${config.tgApiUrl}/editMessageText`, {
-          chat_id,
-          message_id: cq.message.message_id,
-          text: cq.message.text,
-          reply_markup,
-        });
-        responseText = 'Сумма подтверждена'
-      }
-      if (action === 'acceptShareByUser') {
-        const share = await dataService.getDocument("shares", value);
-        if (!share.confirmedByUser) {
-          share.confirmedByUser = true;
-          await sharesService.updateShare(share, user.id);
-        }
-        reply_markup.inline_keyboard[1] = [reply_markup.inline_keyboard[1][0]]
-        await axios.post(`${config.tgApiUrl}/editMessageText`, {
-          chat_id,
-          message_id: cq.message.message_id,
-          text: cq.message.text,
-          reply_markup,
-        });
-        responseText = 'Сумма подтверждена'
-      }
-      if (action === 'muteMember') {
-        const member = await dataService.getDocument("members", value);
-        if (!member.mute) {
-          await membersService.updateMembers({ _id: new ObjectId(value) }, { $set: { mute: true } })
-        };
+      let responseText = 'Спасибо ' + data
+      // if (action === 'acceptShareByPayer') {
+      //   const share = await dataService.getDocument("shares", value);
+      //   if (!share.confirmedByPayer) {
+      //     share.confirmedByPayer = true;
+      //     await sharesService.updateShare(share, user.id);
+      //   }
+      //   reply_markup.inline_keyboard[1] = [reply_markup.inline_keyboard[1][0]]
+      //   await axios.post(`${config.tgApiUrl}/editMessageText`, {
+      //     chat_id,
+      //     message_id: cq.message.message_id,
+      //     text: cq.message.text,
+      //     reply_markup,
+      //   });
+      //   responseText = 'Сумма подтверждена'
+      // }
+      // if (action === 'acceptShareByUser') {
+      //   const share = await dataService.getDocument("shares", value);
+      //   if (!share.confirmedByUser) {
+      //     share.confirmedByUser = true;
+      //     await sharesService.updateShare(share, user.id);
+      //   }
+      //   reply_markup.inline_keyboard[1] = [reply_markup.inline_keyboard[1][0]]
+      //   await axios.post(`${config.tgApiUrl}/editMessageText`, {
+      //     chat_id,
+      //     message_id: cq.message.message_id,
+      //     text: cq.message.text,
+      //     reply_markup,
+      //   });
+      //   responseText = 'Сумма подтверждена'
+      // }
+      // if (action === 'muteMember') {
+      //   const member = await dataService.getDocument("members", value);
+      //   if (!member.mute) {
+      //     await membersService.updateMembers({ _id: new ObjectId(value) }, { $set: { mute: true } })
+      //   };
 
-        reply_markup.inline_keyboard[0][0] = {
-          text: 'Включить уведомления',
-          callback_data: `unmuteMember=${member.id}`
-        }
-        await axios.post(`${config.tgApiUrl}/editMessageText`, {
-          chat_id,
-          message_id: cq.message.message_id,
-          text: cq.message.text,
-          reply_markup,
-        });
-        responseText = 'Уведомления отключены'
-      }
-      if (action === 'unmuteMember') {
-        const member = await dataService.getDocument("members", value);
-        if (member.mute) {
-          await membersService.updateMembers({ _id: new ObjectId(value) }, { $set: { mute: false } })
-        }
-        reply_markup.inline_keyboard[0][0] = {
-          text: 'Отключить уведомления',
-          callback_data: `muteMember=${member.id}`
-        }
-        await axios.post(`${config.tgApiUrl}/editMessageText`, {
-          chat_id,
-          message_id: cq.message.message_id,
-          text: cq.message.text,
-          reply_markup,
-        });
-        responseText = 'Уведомления включены'
-      }
+      //   reply_markup.inline_keyboard[0][0] = {
+      //     text: 'Включить уведомления',
+      //     callback_data: `unmuteMember=${member.id}`
+      //   }
+      //   await axios.post(`${config.tgApiUrl}/editMessageText`, {
+      //     chat_id,
+      //     message_id: cq.message.message_id,
+      //     text: cq.message.text,
+      //     reply_markup,
+      //   });
+      //   responseText = 'Уведомления отключены'
+      // }
+      // if (action === 'unmuteMember') {
+      //   const member = await dataService.getDocument("members", value);
+      //   if (member.mute) {
+      //     await membersService.updateMembers({ _id: new ObjectId(value) }, { $set: { mute: false } })
+      //   }
+      //   reply_markup.inline_keyboard[0][0] = {
+      //     text: 'Отключить уведомления',
+      //     callback_data: `muteMember=${member.id}`
+      //   }
+      //   await axios.post(`${config.tgApiUrl}/editMessageText`, {
+      //     chat_id,
+      //     message_id: cq.message.message_id,
+      //     text: cq.message.text,
+      //     reply_markup,
+      //   });
+      //   responseText = 'Уведомления включены'
+      // }
 
       await axios.post(`${config.tgApiUrl}/answerCallbackQuery`, {
         callback_query_id: cq.id,
@@ -110,10 +110,8 @@ const handleWebhook = async (req, res) => {
           reply_markup: {
             inline_keyboard: [
               [
-                {
-                  text: "Открыть приложение",
-                  web_app: { url: "https://i-will-pay-front.vercel.app" }
-                }
+                { text: "A", callback_data: "BTN_A" },
+                { text: "B", callback_data: "BTN_B" }
               ]
             ]
           }

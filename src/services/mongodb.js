@@ -39,7 +39,7 @@ const createDocument = async (collectionName, doc) => {
     let result;
     try {
         await connectClient();
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         const res = await collection.insertOne(doc);
         const newDocument = await collection.findOne({ _id: res.insertedId });
         return newDocument ? mapDocumentFromMongo(newDocument) : null;
@@ -55,7 +55,7 @@ const createDocuments = async (collectionName, docs) => {
     try {
         await connectClient();
         
-        const collection = getClient().db('i-will-pay').collection(collectionName);
+        const collection = getClient().db(config.mongodbDatabase).collection(collectionName);
         const res = await collection.insertMany(docs);
         // ToDo Получить айдишки созданных записей
         const insertedIds = [];
@@ -74,7 +74,7 @@ const getDocuments = async (collectionName, query) => {
     try {
         await connectClient();
         
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
 
         const res = await collection.find(query).toArray();
         result = res.map(mapDocumentFromMongo);
@@ -90,7 +90,7 @@ const getDocument = async (collectionName, id) => {
     try {
         await connectClient();
         
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         const doc = await collection.findOne({ _id: new ObjectId(id) });
         result = doc ? mapDocumentFromMongo(doc) : null;
     } catch (err) {
@@ -105,7 +105,7 @@ const getDocumentByQuery = async (collectionName, query) => {
     try {
         await connectClient();
         
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         const doc = await collection.findOne(query);
         result = doc ? mapDocumentFromMongo(doc) : null;
     } catch (err) {
@@ -120,7 +120,7 @@ const updateDocument = async (collectionName, doc) => {
     try {
         await connectClient();        
         const { id, ...rest } = doc;
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         await collection.updateOne({ _id: new ObjectId(id) }, { $set: rest });
         const updatedDocument = await collection.findOne({ _id: new ObjectId(id) });
         result = updatedDocument ? mapDocumentFromMongo(updatedDocument) : null;
@@ -135,7 +135,7 @@ const updateDocumentByQuery = async (collectionName, query, update) => {
     let result;
     try {
         await connectClient();
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         await collection.updateOne(query, update);
         const updatedDocument = await collection.findOne(query);
         result = updatedDocument ? mapDocumentFromMongo(updatedDocument) : null;
@@ -151,7 +151,7 @@ const updateDocuments = async (collectionName, query, update) => {
     try {
         await connectClient();
         
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         await collection.updateMany(query, update);
         const updatedDocuments = await collection.find(query).toArray();
         result = updatedDocuments.map(mapDocumentFromMongo);
@@ -167,7 +167,7 @@ const updateDocumentsByQuery = async (collectionName, updates) => {
     try {
         await connectClient();
         
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         
         const bulkOps = updates.map(({ id, updateQuery }) => ({
             updateOne: {
@@ -191,7 +191,7 @@ const deleteDocument = async (collectionName, id) => {
     try {
         await connectClient();
         
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         await collection.deleteOne({ _id: new ObjectId(id) });
         result = true;
     } catch (err) {
@@ -204,7 +204,7 @@ const deleteDocumentByQuery = async (collectionName, query) => {
     let result;
     try {
         await connectClient();
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         await collection.deleteOne(query);
         result = true;
     } catch (err) {
@@ -218,7 +218,7 @@ const deleteDocumentsByQuery = async (collectionName, query) => {
     let result;
     try {
         await connectClient();
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         await collection.deleteMany(query);
         result = true;
     } catch (err) {
@@ -232,7 +232,7 @@ const aggregate = async (collectionName, query) => {
     let result;
     try {
         await connectClient();
-        const collection = client.db('i-will-pay').collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         aggregationResults = await collection.aggregate(query).toArray();
         result = aggregationResults.map(mapDocumentFromMongo);
     } catch (err) {
