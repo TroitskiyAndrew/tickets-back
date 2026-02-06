@@ -101,6 +101,7 @@ const handleWebhook = async (req, res) => {
     }
     const message = update.message
     if (message && message.text === "/start") {
+      const cities = await dataService.getDocuments('city', {})
       await fetch(`${config.tgApiUrl}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -108,31 +109,29 @@ const handleWebhook = async (req, res) => {
           chat_id: message.chat.id,
           text: "Добро пожаловать!",
           reply_markup: {
-            inline_keyboard: [
-              [
-                { text: "A", callback_data: "BTN_A" },
-                { text: "B", callback_data: "BTN_B" }
-              ]
-            ]
+            inline_keyboard:
+              cities.map(city => [
+                  { text: city.name, callback_data: `CITY_${city._id}` },
+                ])
           }
         })
       });
 
     }
-    if (message && message.text.startsWith('Create')) {
-      const events = message.text.split(';');
-      for (const event of events) {
-        const [_, place,type, date] = event.split(':');
-        await dataService.createDocument("event", {
-          place, type, date, tickets: [
-            { type: 0, count: 5, price: 0, priceRub: 0 },
-            { type: 1, count: 30, priceVND: 500, priceRub: 1500 },
-            { type: 2, count: 60, priceVND: 700, priceRub: 2100 },
-            { type: 3, count: 10, priceVND: 100, priceRub: 3000 },
-          ]
-        });
-      }
-    }
+    // if (message && message.text.startsWith('Create')) {
+    //   const events = message.text.split(';');
+    //   for (const event of events) {
+    //     const [_, place,type, date] = event.split(':');
+    //     await dataService.createDocument("event", {
+    //       place, type, date, tickets: [
+    //         { type: 0, count: 5, price: 0, priceRub: 0 },
+    //         { type: 1, count: 30, priceVND: 500, priceRub: 1500 },
+    //         { type: 2, count: 60, priceVND: 700, priceRub: 2100 },
+    //         { type: 3, count: 10, priceVND: 100, priceRub: 3000 },
+    //       ]
+    //     });
+    //   }
+    // }
     console.log(update)
     // if (message && message.new_chat_member && message.new_chat_member.id === 8420107013) {
     //   const chat = message.chat;
