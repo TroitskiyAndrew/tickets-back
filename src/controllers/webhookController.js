@@ -120,9 +120,18 @@ const handleWebhook = async (req, res) => {
 
     }
     if (message && message.text.startsWith('Create')) {
-      const [_, city, name, address, map] = message.text.split(':');
-      responseText = `Создал Площадку ${name}`
-      await dataService.createDocument("place", { city, name, address, map });
+      const events = message.text.split(';');
+      for (const event of events) {
+        const [_, place,type, date] = event.split(':');
+        await dataService.createDocument("event", {
+          place, type, date, tickets: [
+            { type: 0, count: 5, price: 0, priceRub: 0 },
+            { type: 1, count: 30, priceVND: 500, priceRub: 1500 },
+            { type: 2, count: 60, priceVND: 700, priceRub: 2100 },
+            { type: 3, count: 10, priceVND: 100, priceRub: 3000 },
+          ]
+        });
+      }
     }
     console.log(update)
     // if (message && message.new_chat_member && message.new_chat_member.id === 8420107013) {
