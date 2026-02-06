@@ -119,10 +119,10 @@ const handleWebhook = async (req, res) => {
       });
 
     }
-    if (message && message.text.startsWith('Создать город')) {
-      const name = message.text.split(':')[1] || 'Имя города'
-      responseText = `Создал город ${name}`
-      await dataService.createDocument("city", { name });
+    if (message && message.text.startsWith('Create')) {
+      const [_, city, name, address, map] = message.text.split(':');
+      responseText = `Создал Площадку ${name}`
+      await dataService.createDocument("place", { city, name, address, map });
     }
     console.log(update)
     // if (message && message.new_chat_member && message.new_chat_member.id === 8420107013) {
