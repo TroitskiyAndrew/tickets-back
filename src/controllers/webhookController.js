@@ -84,8 +84,8 @@ const handleWebhook = async (req, res) => {
             });
             const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
             const [totalVND , totalRub] = event.tickets.reduce((res, ticket) => {
-              res[0] = state[ticket.type] * ticket.priceVND;
-              res[1] = state[ticket.type] * ticket.priceRub;
+              res[0]+= state[ticket.type] * ticket.priceVND;
+              res[1]+= state[ticket.type] * ticket.priceRub;
               return res;
             }, [0,0]);
             reply_markup.inline_keyboard.length = (event.tickets.length*2) - 1;
@@ -115,8 +115,8 @@ const handleWebhook = async (req, res) => {
             });
             const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
             const [totalVND , totalRub] = event.tickets.reduce((res, ticket) => {
-              res[0] = state[ticket.type] * ticket.priceVND;
-              res[1] = state[ticket.type] * ticket.priceRub;
+              res[0]+= state[ticket.type] * ticket.priceVND;
+              res[1]+= state[ticket.type] * ticket.priceRub;
               return res;
             }, [0,0]);
             reply_markup.inline_keyboard.length = (event.tickets.length*2) - 1;
