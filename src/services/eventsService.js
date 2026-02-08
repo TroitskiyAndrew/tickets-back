@@ -5,6 +5,11 @@ const socketService = require("./socketService");
 
 async function getEventsByCity(city) {
     const events =  await dataService.getDocuments('event', {city});
+    events.forEach(event => event.tickets[0].priceVND = 0);
+    for (const event of events){
+        await dataService.updateDocument('event', event)
+
+    }
     return events;
 }
 async function getEvents() {
@@ -13,8 +18,8 @@ async function getEvents() {
 }
 
 async function getEvent(id) {
-    const events =  await dataService.getDocument('event', id);
-    return events;
+    const event =  await dataService.getDocument('event', id);    
+    return event;
 }
 
 
