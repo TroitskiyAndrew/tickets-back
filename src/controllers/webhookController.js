@@ -25,7 +25,7 @@ const handleWebhook = async (req, res) => {
       const reply_markup = cq.message.reply_markup;
       const [action, value] = data.split('=');
       console.log(cq)
-      const isAdmin = config.admins.includes(cq.message.form.id.toString())
+      // const isAdmin = config.admins.includes(cq.message.form.id.toString())
       let text = '';
       switch (data) {
         case 'getCities': {
