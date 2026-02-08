@@ -12,4 +12,5 @@ module.exports = {
     prod: process.env.LOCAL_DEVELOPMENT  == null,
     tgApiUrl:`https://api.telegram.org/bot${process.env.BOT_TOKEN}`,
     admins: process.env.ADMINS ? process.env.ADMINS.split(',') : [],
+    ticketTypes: process.env.TICKET_TYPES ? JSON.parse(process.env.TICKET_TYPES) : {},
 }

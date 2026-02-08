@@ -53,7 +53,7 @@ const handleWebhook = async (req, res) => {
           case 'EVENT': {
             const event = await eventsService.getEvent(value);
             reply_markup.inline_keyboard = event.tickets.map(ticket => [
-              { text: `${ticket.type}, ${ticket.priceVND}`, callback_data: `TICKET_${ticket.type}` },
+              { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет' }, ${ticket.priceVND}`, callback_data: `TICKET_${ticket.type}` },
             ])
             reply_markup.inline_keyboard.push([
               { text: "Назад", callback_data: `CITY_${context}` },
