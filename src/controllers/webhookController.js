@@ -19,6 +19,7 @@ const handleWebhook = async (req, res) => {
     }
 
     if (update.callback_query) {
+      let emptyButton = false;
       const cq = update.callback_query;
       const data = cq.data;
       const chat_id = cq.message.chat.id;
@@ -71,18 +72,18 @@ const handleWebhook = async (req, res) => {
             break;
           }
           default:
-            await answerCallbackQuery(callbackQuery.id);
-            return;
+            emptyButton = true
             break;
         }
       }
-
-      await axios.post(`${config.tgApiUrl}/editMessageText`, {
-        chat_id,
-        message_id: cq.message.message_id,
-        text,
-        reply_markup,
-      });
+      if (!emptyButton) {
+        await axios.post(`${config.tgApiUrl}/editMessageText`, {
+          chat_id,
+          message_id: cq.message.message_id,
+          text,
+          reply_markup,
+        });
+      }
 
       await axios.post(`${config.tgApiUrl}/answerCallbackQuery`, {
         callback_query_id: cq.id,
