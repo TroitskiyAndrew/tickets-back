@@ -26,7 +26,7 @@ const handleWebhook = async (req, res) => {
       const [action, value] = data.split('=');
       console.log('cq.from.id', cq.from.id)
       // const isAdmin = config.admins.includes(cq.message.form.id.toString())
-      let text = '';
+      let text = cq.message.text;
       if (data === 'getCities') {
         const cities = await citiesService.getCities();
         console.log(cities[0]);
