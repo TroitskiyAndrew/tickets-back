@@ -1,5 +1,5 @@
 const dataService = require("../services/mongodb");
-const sharesService = require("../services/sharesService");
+const citiesService = require("../services/citiesService");
 const roomsService = require("../services/roomsService");
 const membersService = require("../services/membersService");
 const config = require("../config/config");
@@ -26,6 +26,24 @@ const handleWebhook = async (req, res) => {
       const [action, value] = data.split('=');
       const user = await dataService.getDocumentByQuery("users", { telegramId: cq.from.id });
       let responseText = 'Спасибо ' + data
+      switch (data) {
+        case 'getCities': {
+          const cities = await citiesService.getCities();
+          reply_markup.inline_keyboard = cities.map(city => [
+            { text: city.name, callback_data: `CITY_${city._id}` },
+          ])
+          await axios.post(`${config.tgApiUrl}/editMessageText`, {
+            chat_id,
+            message_id: cq.message.message_id,
+            text: cq.message.text,
+            reply_markup,
+          });
+
+          break;
+        }
+        default:
+          break;
+      }
       // if (action === 'acceptShareByPayer') {
       //   const share = await dataService.getDocument("shares", value);
       //   if (!share.confirmedByPayer) {
@@ -101,7 +119,6 @@ const handleWebhook = async (req, res) => {
     }
     const message = update.message
     if (message && message.text === "/start") {
-      const cities = await dataService.getDocuments('city', {})
       await fetch(`${config.tgApiUrl}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,10 +126,11 @@ const handleWebhook = async (req, res) => {
           chat_id: message.chat.id,
           text: "Добро пожаловать!",
           reply_markup: {
-            inline_keyboard:
-              cities.map(city => [
-                  { text: city.name, callback_data: `CITY_${city._id}` },
-                ])
+            inline_keyboard: [
+              [
+                { text: "Список городов", callback_data: "getCities" },
+              ]
+            ]
           }
         })
       });
@@ -133,57 +151,7 @@ const handleWebhook = async (req, res) => {
     //   }
     // }
     console.log(update)
-    // if (message && message.new_chat_member && message.new_chat_member.id === 8420107013) {
-    //   const chat = message.chat;
-    //   if (chat.type.endsWith("group")) {
-    //     let userFinal = null;
-    //     userFinal = await dataService.getDocumentByQuery("users", { telegramId: message.from.id });
-    //     if (!userFinal) {
-    //       userFinal = await dataService.createDocument("users", { telegramId: message.from.id, name: message.from.username || message.from.first_name })
-    //     }
-    //     let room = await dataService.getDocumentByQuery("rooms", { chatId: chat.id })
-    //     if (!room) {
-    //       room = await roomsService.createRoom({ chatId: chat.id, name: chat.title }, { userId: userFinal.id, name: userFinal.name, payer: userFinal.id })
-    //     } else {
-    //       const member = await dataService.getDocumentByQuery("members", { userId: userFinal.id, roomId: room.id });
-    //       if (!member) {
-    //         await membersService.createMember({
-    //           userId: userFinal.id,
-    //           roomId: room.id,
-    //           name: userFinal.name,
-    //           isAdmin: false,
-    //           grantedBy: null,
-    //           isGuest: false,
-    //           payer: userFinal.id
-    //         })
-    //       } else if (member.isGuest) {
-    //         await dataService.updateDocument("members", { ...member, isGuest: false })
-    //       }
-    //     }
-    //     await fetch(`${config.tgApiUrl}/sendMessage`, {
-    //       method: "POST",
-    //       headers: { "Content-Type": "application/json" },
-    //       body: JSON.stringify({
-    //         chat_id: chat.id,
-    //         text: `Создана группа\n${room.name}`,
-    //         reply_markup: {
-    //           inline_keyboard: [
-    //             [
-    //               {
-    //                 text: "Присоединиться к группе",
-    //                 url: `https://t.me/I_WillPay_bot?startapp=roomId=${room.id}`
-    //               },
-    //               {
-    //                 text: "Создать платеж",
-    //                 url: `https://t.me/I_WillPay_bot?startapp=roomId=${room.id}${config.splitParams}paymentId=newPaymentId`
-    //               }
-    //             ]
-    //           ]
-    //         }
-    //       })
-    //     });
-    //   }
-    // }
+
 
     res.json({ ok: true });
   } catch (error) {
