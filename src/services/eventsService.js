@@ -4,13 +4,14 @@ const socketService = require("./socketService");
 
 
 async function getEvents(city) {
-    const events = await dataService.getDocuments('event', {});
+    const allEvents = await dataService.getDocuments('event', {});
     const places =  await dataService.getDocuments('place', {});
-    for (const event of events){
+    for (const event of allEvents){
         const place = places.find(place => place.id === event.place);
         event.city = place.city;
         await dataService.updateDocument('event',event)
     }
+    const events =  await dataService.getDocuments('event', {city});
     return events;
 }
 

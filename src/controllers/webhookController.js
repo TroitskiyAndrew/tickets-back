@@ -1,6 +1,6 @@
 const dataService = require("../services/mongodb");
 const citiesService = require("../services/citiesService");
-const roomsService = require("../services/roomsService");
+const eventsService = require("../services/eventsService");
 const membersService = require("../services/membersService");
 const config = require("../config/config");
 const axios = require("axios");
@@ -24,7 +24,7 @@ const handleWebhook = async (req, res) => {
       const chat_id = cq.message.chat.id;
       const reply_markup = cq.message.reply_markup;
       const [action, value] = data.split('=');
-      console.log('cq.from', cq.from)
+      console.log('cq.from.id', cq.from.id)
       // const isAdmin = config.admins.includes(cq.message.form.id.toString())
       let text = 'Рандомный текст';
       if (data === 'getCities') {
@@ -38,8 +38,12 @@ const handleWebhook = async (req, res) => {
       } else {
         const [action, value] = data.split('_');
         switch (action) {
-          case 'getCities': {
-            const cities = await citiesService.getCities();
+          case 'CITY': {
+            const events = await eventsService.getEvents(value);
+            reply_markup.inline_keyboard = events.map(event => [
+              { text: event.type, callback_data: `EVENT_${event.id}` },
+            ])
+            text = "Текст про список ивентов"
             break;
           }
           default:
@@ -50,7 +54,7 @@ const handleWebhook = async (req, res) => {
       await axios.post(`${config.tgApiUrl}/editMessageText`, {
         chat_id,
         message_id: cq.message.message_id,
-        text: text,
+        text,
         reply_markup,
       });
 
