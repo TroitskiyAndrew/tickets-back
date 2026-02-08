@@ -80,7 +80,7 @@ const handleWebhook = async (req, res) => {
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
               row[1].text = state[index];
             });
-            text += ".";
+            text += "\u200B";
             break;
           }
           case 'DECR': {
@@ -93,7 +93,7 @@ const handleWebhook = async (req, res) => {
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
               row[1].text = state[index];
             });
-            text += ".";
+           text += "\u200B";
             break;
           }
           case 'HOME': {
