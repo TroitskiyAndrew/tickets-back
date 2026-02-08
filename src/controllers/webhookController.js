@@ -24,15 +24,15 @@ const handleWebhook = async (req, res) => {
       const chat_id = cq.message.chat.id;
       const reply_markup = cq.message.reply_markup;
       const [action, value] = data.split('=');
-      console.log('cq.from.id', cq.from.id)
+      console.log('cq.from', cq.from)
       // const isAdmin = config.admins.includes(cq.message.form.id.toString())
-      let text = cq.message.text;
+      let text = 'Рандомный текст';
       if (data === 'getCities') {
         const cities = await citiesService.getCities();
         console.log(cities[0]);
         console.log(isAdmin)
-        reply_markup.inline_keyboard = cities.map((city, i) => [
-          { text: city.name, callback_data: `CITY_${i}` },
+        reply_markup.inline_keyboard = cities.map(city => [
+          { text: city.name, callback_data: `CITY_${city.id}` },
         ])
         text = "Текст про список городов"
       } else {
