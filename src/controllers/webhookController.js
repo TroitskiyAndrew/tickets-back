@@ -35,7 +35,7 @@ const handleWebhook = async (req, res) => {
         reply_markup.inline_keyboard.push([
           { text: "Назад", callback_data: `HOME` },
         ])
-        text = "Текст про список городов"
+        text = cq.message.textж
       } else {
         const [action, value, context, stateStr] = data.split('_');
         switch (action) {
@@ -53,6 +53,7 @@ const handleWebhook = async (req, res) => {
           case 'EVENT': {
             const event = await eventsService.getEvent(value);
             const state = stateStr ? stateStr.split(',') : event.tickets.map(() => 0);
+            state.push(0,0)
             reply_markup.inline_keyboard = event.tickets.reduce((rows, ticket) => {
               rows.push([
                 { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет'}, ${ticket.priceVND}.000 VND/${ticket.priceRub} руб`, callback_data: `TICKET_${ticket.type}` }
@@ -77,9 +78,9 @@ const handleWebhook = async (req, res) => {
             const eventType = Number(context);
             state[eventType] = state[eventType] + 1;
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
-              row[1].text = state[context];
+              row[1].text = state[index];
             });
-            text += "\u200B";
+            text += " ";
             break;
           }
           case 'DECR': {
@@ -90,9 +91,9 @@ const handleWebhook = async (req, res) => {
               state[eventType] = state[eventType] - 1;
             }
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
-              row[1].text = state[context];
+              row[1].text = state[index];
             });
-            text += "\u200B";
+            text += " ";
             break;
           }
           case 'HOME': {
