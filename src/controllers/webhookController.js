@@ -38,7 +38,7 @@ const handleWebhook = async (req, res) => {
         ])
         text = "Текст про список городов"
       } else {
-        const [action, value, context] = data.split('_');
+        const [action, value, context, stateStr] = data.split('_');
         switch (action) {
           case 'CITY': {
             const events = await eventsService.getEventsByCity(value);
@@ -53,7 +53,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'EVENT': {
             const event = await eventsService.getEvent(value);
-            const state = context ? JSON.parse(context) : event.tickets.reduce((st, ticket) => {
+            const state = stateStr ? JSON.parse(stateStr) : event.tickets.reduce((st, ticket) => {
               st[ticket.type.toString()] = 0;
               return st;
             },{})
