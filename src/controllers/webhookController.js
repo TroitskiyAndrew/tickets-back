@@ -53,18 +53,15 @@ const handleWebhook = async (req, res) => {
           }
           case 'EVENT': {
             const event = await eventsService.getEvent(value);
-            const state = stateStr ? JSON.parse(stateStr) : event.tickets.reduce((st, ticket) => {
-              st[ticket.type.toString()] = 0;
-              return st;
-            }, {})
+            const state = stateStr ? stateStr.split(',') : event.tickets.map(() => 0);
             reply_markup.inline_keyboard = event.tickets.reduce((rows, ticket) => {
               rows.push([
                 { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет'}, ${ticket.priceVND}.000 VND/${ticket.priceRub} руб`, callback_data: `TICKET_${ticket.type}` }
               ])
               rows.push([
-                { text: '➖', callback_data: `DECR_${value}_${context}_${JSON.stringify(state)}_${ticket.type}`},
+                { text: '➖', callback_data: `DECR_${value}_${context}_${state.join(',')}_${ticket.type}` },
                 { text: state[ticket.type.toString()], callback_data: "NOTHING" },
-                { text: '➕', callback_data: `INCR_${value}_${context}_${JSON.stringify(state)}_${ticket.type}` }
+                { text: '➕', callback_data: `INCR_${value}_${context}_${state.join(',')}_${ticket.type}` }
               ])
               return rows;
             }, [])
@@ -77,21 +74,17 @@ const handleWebhook = async (req, res) => {
           }
           case 'INCR': {
             const event = await eventsService.getEvent(value);
-            const state = stateStr ? JSON.parse(stateStr) : event.tickets.reduce((st, ticket) => {
-              st[ticket.type.toString()] = 0;
-              return st;
-            }, {});
-            if (state[subContext] > 0) {
-              state[subContext] = state[subContext] -1;
-            }
+            const state = stateStr ? stateStr.split(',') : event.tickets.map(() => 0);
+            const eventType = Number(subContext);
+            state[eventType] = state[eventType] + 1;
             reply_markup.inline_keyboard = event.tickets.reduce((rows, ticket) => {
               rows.push([
                 { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет'}, ${ticket.priceVND}.000 VND/${ticket.priceRub} руб`, callback_data: `TICKET_${ticket.type}` }
               ])
               rows.push([
-                { text: '➖', callback_data: `DECR_${value}_${context}_${JSON.stringify(state)}_${ticket.type}`},
+                { text: '➖', callback_data: `DECR_${value}_${context}_${state.join(',')}_${ticket.type}` },
                 { text: state[ticket.type.toString()], callback_data: "NOTHING" },
-                { text: '➕', callback_data: `INCR_${value}_${context}_${JSON.stringify(state)}_${ticket.type}` }
+                { text: '➕', callback_data: `INCR_${value}_${context}_${state.join(',')}_${ticket.type}` }
               ])
               return rows;
             }, [])
@@ -102,21 +95,21 @@ const handleWebhook = async (req, res) => {
             text = "Текст про список билетов"
             break;
           }
-                    case 'DECR': {
+          case 'DECR': {
             const event = await eventsService.getEvent(value);
-            const state = stateStr ? JSON.parse(stateStr) : event.tickets.reduce((st, ticket) => {
-              st[ticket.type.toString()] = 0;
-              return st;
-            }, {});
-            state[subContext] = state[subContext] + 1;
+            const state = stateStr ? stateStr.split(',') : event.tickets.map(() => 0);
+            const eventType = Number(subContext);
+            if (state[eventType] > 0) {
+              state[eventType] = state[eventType] - 1;
+            }
             reply_markup.inline_keyboard = event.tickets.reduce((rows, ticket) => {
               rows.push([
                 { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет'}, ${ticket.priceVND}.000 VND/${ticket.priceRub} руб`, callback_data: `TICKET_${ticket.type}` }
               ])
               rows.push([
-                { text: '➖', callback_data: `DECR_${value}_${context}_${JSON.stringify(state)}_${ticket.type}`},
+                { text: '➖', callback_data: `DECR_${value}_${context}_${state.join(',')}_${ticket.type}` },
                 { text: state[ticket.type.toString()], callback_data: "NOTHING" },
-                { text: '➕', callback_data: `INCR_${value}_${context}_${JSON.stringify(state)}_${ticket.type}` }
+                { text: '➕', callback_data: `INCR_${value}_${context}_${state.join(',')}_${ticket.type}` }
               ])
               return rows;
             }, [])
