@@ -74,7 +74,7 @@ const handleWebhook = async (req, res) => {
           case 'INCR': {
             const event = await eventsService.getEvent(value);
             const state = stateStr ? stateStr.split(',') : event.tickets.map(() => 0);
-            const eventType = Number(subContext);
+            const eventType = Number(context);
             state[eventType] = state[eventType] + 1;
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
               row[1].text = state[context];
@@ -85,7 +85,7 @@ const handleWebhook = async (req, res) => {
           case 'DECR': {
             const event = await eventsService.getEvent(value);
             const state = stateStr ? stateStr.split(',') : event.tickets.map(() => 0);
-            const eventType = Number(subContext);
+            const eventType = Number(context);
             if (state[eventType] > 0) {
               state[eventType] = state[eventType] - 1;
             }
