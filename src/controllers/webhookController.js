@@ -37,7 +37,7 @@ const handleWebhook = async (req, res) => {
         ])
         text = "Текст про список городов"
       } else {
-        const [action, value, context, stateStr, subContext] = data.split('_');
+        const [action, value, context, stateStr] = data.split('_');
         switch (action) {
           case 'CITY': {
             const events = await eventsService.getEventsByCity(value);
@@ -58,9 +58,9 @@ const handleWebhook = async (req, res) => {
                 { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет'}, ${ticket.priceVND}.000 VND/${ticket.priceRub} руб`, callback_data: `TICKET_${ticket.type}` }
               ])
               rows.push([
-                { text: '➖', callback_data: `DECR_${value}_${ticket.type}_c_${state.join(',')}` },
+                { text: '➖', callback_data: `DECR_${value}_${ticket.type}_${state.join(',')}` },
                 { text: state[ticket.type], callback_data: "NOTHING" },
-                { text: '➕', callback_data: `INCR_${value}_${ticket.type}_c_${state.join(',')}` }
+                { text: '➕', callback_data: `INCR_${value}_${ticket.type}_${state.join(',')}` }
               ])
               return rows;
             }, [])
@@ -77,7 +77,7 @@ const handleWebhook = async (req, res) => {
             const eventType = Number(subContext);
             state[eventType] = state[eventType] + 1;
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
-              row[1].text = state[ticket.type];
+              row[1].text = state[context];
             });
             text = "Текст про список билетов"
             break;
@@ -90,7 +90,7 @@ const handleWebhook = async (req, res) => {
               state[eventType] = state[eventType] - 1;
             }
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
-              row[1].text = state[ticket.type];
+              row[1].text = state[context];
             });
             text = "Текст про список билетов"
             break;
