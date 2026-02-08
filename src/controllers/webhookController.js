@@ -80,7 +80,7 @@ const handleWebhook = async (req, res) => {
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
               row[0].callback_data = `DECR_${value}_${context}_${state.join(',')}`;
               row[1].text = state[index];
-              row[0].callback_data = `INCR_${value}_${context}_${state.join(',')}`;
+              row[2].callback_data = `INCR_${value}_${context}_${state.join(',')}`;
             });
             text += "\u200B";
             break;
@@ -95,7 +95,7 @@ const handleWebhook = async (req, res) => {
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
               row[0].callback_data = `DECR_${value}_${context}_${state.join(',')}`;
               row[1].text = state[index];
-              row[0].callback_data = `INCR_${value}_${context}_${state.join(',')}`;
+              row[2].callback_data = `INCR_${value}_${context}_${state.join(',')}`;
             });
            text += "\u200B";
             break;
