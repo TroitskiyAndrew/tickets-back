@@ -8,7 +8,8 @@ async function getCities() {
     const events = await eventsService.getEvents();
     const eventsMap = events.reduce((map, event) => {
         const events = map.get(event.city) || [];
-        events.push(event)
+        events.push(event);
+        map.set(event.city, events);
         return map
     }, new Map());
     cities.forEach(city => city.events = eventsMap.get(city.id))
