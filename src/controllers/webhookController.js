@@ -26,7 +26,7 @@ const handleWebhook = async (req, res) => {
       const reply_markup = cq.message.reply_markup;
       const userId = cq.from.id.toString()
       isAdmin = config.admins.includes(userId)
-      let text = 'Рандомный текст';
+      let text = cq.message.text;
       if (data === 'getCities') {
         const cities = await citiesService.getCities();
         reply_markup.inline_keyboard = cities.map(city => [
@@ -35,7 +35,7 @@ const handleWebhook = async (req, res) => {
         reply_markup.inline_keyboard.push([
           { text: "Назад", callback_data: `HOME` },
         ])
-        text = cq.message.textж
+        text = "Текст про список городов";
       } else {
         const [action, value, context, stateStr] = data.split('_');
         switch (action) {
