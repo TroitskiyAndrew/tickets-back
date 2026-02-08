@@ -82,6 +82,21 @@ const handleWebhook = async (req, res) => {
               row[1].text = state[index];
               row[2].callback_data = `INCR_${value}_${index}_${state.join(',')}`;
             });
+            const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
+            const [totalVND , totalRub] = event.tickets.reduce((res, ticket) => {
+              res[0] = state[ticket.type] * ticket.priceVND;
+              res[1] = state[ticket.type] * ticket.priceRub;
+            }, [0,0]);
+            reply_markup.inline_keyboard.length = event.tickets.length - 1;
+            if(totalVND > 0) {
+              reply_markup.inline_keyboard.push([
+                { text: `Купить за ${totalVND}.000 VND`, callback_data: "NOTHING" },
+              ])
+              reply_markup.inline_keyboard.push([
+                { text: `Купить за ${totalRub} руб`, callback_data: "NOTHING" },
+              ])
+            }
+            reply_markup.inline_keyboard.push(backButton)
             text += "\u200B";
             break;
           }
@@ -97,6 +112,21 @@ const handleWebhook = async (req, res) => {
               row[1].text = state[index];
               row[2].callback_data = `INCR_${value}_${index}_${state.join(',')}`;
             });
+            const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
+            const [totalVND , totalRub] = event.tickets.reduce((res, ticket) => {
+              res[0] = state[ticket.type] * ticket.priceVND;
+              res[1] = state[ticket.type] * ticket.priceRub;
+            }, [0,0]);
+            reply_markup.inline_keyboard.length = event.tickets.length - 1;
+            if(totalVND > 0) {
+              reply_markup.inline_keyboard.push([
+                { text: `Купить за ${totalVND}.000 VND`, callback_data: "NOTHING" },
+              ])
+              reply_markup.inline_keyboard.push([
+                { text: `Купить за ${totalRub} руб`, callback_data: "NOTHING" },
+              ])
+            }
+            reply_markup.inline_keyboard.push(backButton)
            text += "\u200B";
             break;
           }
