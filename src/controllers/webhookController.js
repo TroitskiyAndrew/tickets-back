@@ -24,24 +24,24 @@ const handleWebhook = async (req, res) => {
       const chat_id = cq.message.chat.id;
       const reply_markup = cq.message.reply_markup;
       const [action, value] = data.split('=');
-      console.log('cq.from.id', cq.from.id)
-      // const isAdmin = config.admins.includes(cq.message.form.id.toString())
+      const userId = cq.from.id.toString()
+      isAdmin = config.admins.includes(userId)
       let text = 'Рандомный текст';
       if (data === 'getCities') {
         const cities = await citiesService.getCities();
         console.log(cities[0]);
         console.log(isAdmin)
         reply_markup.inline_keyboard = cities.map(city => [
-          { text: city.name, callback_data: `CITY_${city.id}` },
+          { text: `${city.name}(${city.events.map(event => event.date).join(', ')})`, callback_data: `CITY_${city.id}` },
         ])
         text = "Текст про список городов"
       } else {
         const [action, value] = data.split('_');
         switch (action) {
           case 'CITY': {
-            const events = await eventsService.getEvents(value);
+            const events = await eventsService.getEventsByCity(value);
             reply_markup.inline_keyboard = events.map(event => [
-              { text: event.type, callback_data: `EVENT_${event.id}` },
+              { text: `${event.type}, ${event.date}`, callback_data: `EVENT_${event.id}` },
             ])
             text = "Текст про список ивентов"
             break;

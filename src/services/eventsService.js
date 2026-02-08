@@ -3,15 +3,12 @@ const dataService = require("./mongodb");
 const socketService = require("./socketService");
 
 
-async function getEvents(city) {
-    const allEvents = await dataService.getDocuments('event', {});
-    const places =  await dataService.getDocuments('place', {});
-    for (const event of allEvents){
-        const place = places.find(place => place.id === event.place);
-        event.city = place.city;
-        await dataService.updateDocument('event',event)
-    }
+async function getEventsByCity(city) {
     const events =  await dataService.getDocuments('event', {city});
+    return events;
+}
+async function getEvents() {
+    const events =  await dataService.getDocuments('event', {});
     return events;
 }
 
@@ -19,4 +16,5 @@ async function getEvents(city) {
 
 module.exports = {
     getEvents: getEvents,
+    getEventsByCity: getEventsByCity,
 };
