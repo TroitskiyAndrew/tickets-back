@@ -24,7 +24,7 @@ const handleWebhook = async (req, res) => {
       const chat_id = cq.message.chat.id;
       const reply_markup = cq.message.reply_markup;
       const [action, value] = data.split('=');
-      console.log(cq)
+      console.log('cq.from' ,cq.from)
       // const isAdmin = config.admins.includes(cq.message.form.id.toString())
       let text = '';
       switch (data) {
