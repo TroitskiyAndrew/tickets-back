@@ -24,7 +24,6 @@ const handleWebhook = async (req, res) => {
       const data = cq.data;
       const chat_id = cq.message.chat.id;
       const reply_markup = cq.message.reply_markup;
-      const [action, value] = data.split('=');
       const userId = cq.from.id.toString()
       isAdmin = config.admins.includes(userId)
       let text = 'Рандомный текст';
@@ -59,9 +58,9 @@ const handleWebhook = async (req, res) => {
                 { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет'}, ${ticket.priceVND}.000 VND/${ticket.priceRub} руб`, callback_data: `TICKET_${ticket.type}` }
               ])
               rows.push([
-                { text: '➖', callback_data: `DECR_${value}_${context}_${state.join(',')}_${ticket.type}` },
-                { text: state[ticket.type.toString()], callback_data: "NOTHING" },
-                { text: '➕', callback_data: `INCR_${value}_${context}_${state.join(',')}_${ticket.type}` }
+                { text: '➖', callback_data: `DECR_${value}_${ticket.type}_c_${state.join(',')}` },
+                { text: state[ticket.type], callback_data: "NOTHING" },
+                { text: '➕', callback_data: `INCR_${value}_${ticket.type}_c_${state.join(',')}` }
               ])
               return rows;
             }, [])
@@ -77,21 +76,9 @@ const handleWebhook = async (req, res) => {
             const state = stateStr ? stateStr.split(',') : event.tickets.map(() => 0);
             const eventType = Number(subContext);
             state[eventType] = state[eventType] + 1;
-            reply_markup.inline_keyboard = event.tickets.reduce((rows, ticket) => {
-              rows.push([
-                { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет'}, ${ticket.priceVND}.000 VND/${ticket.priceRub} руб`, callback_data: `TICKET_${ticket.type}` }
-              ])
-              rows.push([
-                { text: '➖', callback_data: `DECR_${value}_${context}_${state.join(',')}_${ticket.type}` },
-                { text: state[ticket.type.toString()], callback_data: "NOTHING" },
-                { text: '➕', callback_data: `INCR_${value}_${context}_${state.join(',')}_${ticket.type}` }
-              ])
-              return rows;
-            }, [])
-
-            reply_markup.inline_keyboard.push([
-              { text: "Назад", callback_data: `CITY_${context}` },
-            ])
+            reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
+              row[1].text = state[ticket.type];
+            });
             text = "Текст про список билетов"
             break;
           }
@@ -102,21 +89,9 @@ const handleWebhook = async (req, res) => {
             if (state[eventType] > 0) {
               state[eventType] = state[eventType] - 1;
             }
-            reply_markup.inline_keyboard = event.tickets.reduce((rows, ticket) => {
-              rows.push([
-                { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет'}, ${ticket.priceVND}.000 VND/${ticket.priceRub} руб`, callback_data: `TICKET_${ticket.type}` }
-              ])
-              rows.push([
-                { text: '➖', callback_data: `DECR_${value}_${context}_${state.join(',')}_${ticket.type}` },
-                { text: state[ticket.type.toString()], callback_data: "NOTHING" },
-                { text: '➕', callback_data: `INCR_${value}_${context}_${state.join(',')}_${ticket.type}` }
-              ])
-              return rows;
-            }, [])
-
-            reply_markup.inline_keyboard.push([
-              { text: "Назад", callback_data: `CITY_${context}` },
-            ])
+            reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
+              row[1].text = state[ticket.type];
+            });
             text = "Текст про список билетов"
             break;
           }
