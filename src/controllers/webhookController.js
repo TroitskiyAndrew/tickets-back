@@ -86,6 +86,7 @@ const handleWebhook = async (req, res) => {
             const [totalVND , totalRub] = event.tickets.reduce((res, ticket) => {
               res[0] = state[ticket.type] * ticket.priceVND;
               res[1] = state[ticket.type] * ticket.priceRub;
+              return res;
             }, [0,0]);
             reply_markup.inline_keyboard.length = event.tickets.length - 1;
             if(totalVND > 0) {
