@@ -74,13 +74,13 @@ const handleWebhook = async (req, res) => {
           }
           case 'INCR': {
             const event = await eventsService.getEvent(value);
-            const state = stateStr ? stateStr.split(',') : event.tickets.map(() => 0);
+            const state = stateStr ? stateStr.split(',').map(Number) : event.tickets.map(() => 0);
             const eventType = Number(context);
             state[eventType] = state[eventType] + 1;
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
               row[1].text = state[index];
             });
-            text += " ";
+            text += ".";
             break;
           }
           case 'DECR': {
@@ -93,7 +93,7 @@ const handleWebhook = async (req, res) => {
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
               row[1].text = state[index];
             });
-            text += " ";
+            text += ".";
             break;
           }
           case 'HOME': {
