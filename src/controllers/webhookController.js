@@ -10,7 +10,7 @@ const { sendMessage } = require("../services/messageService");
 const handleWebhook = async (req, res) => {
   try {
     const update = req.body;
-
+    let isAdmin = false;
     if (update._sendMessage) {
       res.json({ ok: true });
       console.log(req.body)
@@ -24,95 +24,34 @@ const handleWebhook = async (req, res) => {
       const chat_id = cq.message.chat.id;
       const reply_markup = cq.message.reply_markup;
       const [action, value] = data.split('=');
-      const user = await dataService.getDocumentByQuery("users", { telegramId: cq.from.id });
-      let responseText = 'Спасибо ' + data
+      const isAdmin = config.admins.includes(cq.form.id.toString())
+      let text = '';
       switch (data) {
         case 'getCities': {
           const cities = await citiesService.getCities();
+          console.log(cities[0]);
+          console.log(isAdmin)
           reply_markup.inline_keyboard = cities.map(city => [
             { text: city.name, callback_data: `CITY_${city._id}` },
           ])
-          await axios.post(`${config.tgApiUrl}/editMessageText`, {
-            chat_id,
-            message_id: cq.message.message_id,
-            text: cq.message.text,
-            reply_markup,
-          });
+          text = "Текст про список городов"
 
           break;
         }
         default:
           break;
       }
-      // if (action === 'acceptShareByPayer') {
-      //   const share = await dataService.getDocument("shares", value);
-      //   if (!share.confirmedByPayer) {
-      //     share.confirmedByPayer = true;
-      //     await sharesService.updateShare(share, user.id);
-      //   }
-      //   reply_markup.inline_keyboard[1] = [reply_markup.inline_keyboard[1][0]]
-      //   await axios.post(`${config.tgApiUrl}/editMessageText`, {
-      //     chat_id,
-      //     message_id: cq.message.message_id,
-      //     text: cq.message.text,
-      //     reply_markup,
-      //   });
-      //   responseText = 'Сумма подтверждена'
-      // }
-      // if (action === 'acceptShareByUser') {
-      //   const share = await dataService.getDocument("shares", value);
-      //   if (!share.confirmedByUser) {
-      //     share.confirmedByUser = true;
-      //     await sharesService.updateShare(share, user.id);
-      //   }
-      //   reply_markup.inline_keyboard[1] = [reply_markup.inline_keyboard[1][0]]
-      //   await axios.post(`${config.tgApiUrl}/editMessageText`, {
-      //     chat_id,
-      //     message_id: cq.message.message_id,
-      //     text: cq.message.text,
-      //     reply_markup,
-      //   });
-      //   responseText = 'Сумма подтверждена'
-      // }
-      // if (action === 'muteMember') {
-      //   const member = await dataService.getDocument("members", value);
-      //   if (!member.mute) {
-      //     await membersService.updateMembers({ _id: new ObjectId(value) }, { $set: { mute: true } })
-      //   };
 
-      //   reply_markup.inline_keyboard[0][0] = {
-      //     text: 'Включить уведомления',
-      //     callback_data: `unmuteMember=${member.id}`
-      //   }
-      //   await axios.post(`${config.tgApiUrl}/editMessageText`, {
-      //     chat_id,
-      //     message_id: cq.message.message_id,
-      //     text: cq.message.text,
-      //     reply_markup,
-      //   });
-      //   responseText = 'Уведомления отключены'
-      // }
-      // if (action === 'unmuteMember') {
-      //   const member = await dataService.getDocument("members", value);
-      //   if (member.mute) {
-      //     await membersService.updateMembers({ _id: new ObjectId(value) }, { $set: { mute: false } })
-      //   }
-      //   reply_markup.inline_keyboard[0][0] = {
-      //     text: 'Отключить уведомления',
-      //     callback_data: `muteMember=${member.id}`
-      //   }
-      //   await axios.post(`${config.tgApiUrl}/editMessageText`, {
-      //     chat_id,
-      //     message_id: cq.message.message_id,
-      //     text: cq.message.text,
-      //     reply_markup,
-      //   });
-      //   responseText = 'Уведомления включены'
-      // }
+      await axios.post(`${config.tgApiUrl}/editMessageText`, {
+            chat_id,
+            message_id: cq.message.message_id,
+            text: cq.message.text,
+            reply_markup,
+          });
 
       await axios.post(`${config.tgApiUrl}/answerCallbackQuery`, {
         callback_query_id: cq.id,
-        text: responseText
+        // text: responseText
       });
 
 

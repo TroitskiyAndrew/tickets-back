@@ -11,4 +11,5 @@ module.exports = {
     telegrammHeader: process.env.TELEGRAMM_HEADER  || "",
     prod: process.env.LOCAL_DEVELOPMENT  == null,
     tgApiUrl:`https://api.telegram.org/bot${process.env.BOT_TOKEN}`,
+    admins: process.env.ADMINS ? process.env.ADMINS.split(',') : [],
 }
