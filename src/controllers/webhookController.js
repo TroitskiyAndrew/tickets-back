@@ -78,20 +78,24 @@ const handleWebhook = async (req, res) => {
             const eventType = Number(context);
             state[eventType] = state[eventType] + 1;
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
+              row[0].callback_data = `DECR_${value}_${context}_${state.join(',')}`;
               row[1].text = state[index];
+              row[0].callback_data = `INCR_${value}_${context}_${state.join(',')}`;
             });
             text += "\u200B";
             break;
           }
           case 'DECR': {
             const event = await eventsService.getEvent(value);
-            const state = stateStr ? stateStr.split(',') : event.tickets.map(() => 0);
+            const state = stateStr ? stateStr.split(',').map(Number) : event.tickets.map(() => 0);
             const eventType = Number(context);
             if (state[eventType] > 0) {
               state[eventType] = state[eventType] - 1;
             }
             reply_markup.inline_keyboard.filter(row => row.length === 3).forEach((row, index) => {
+              row[0].callback_data = `DECR_${value}_${context}_${state.join(',')}`;
               row[1].text = state[index];
+              row[0].callback_data = `INCR_${value}_${context}_${state.join(',')}`;
             });
            text += "\u200B";
             break;
