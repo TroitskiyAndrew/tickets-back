@@ -46,7 +46,7 @@ const handleWebhook = async (req, res) => {
               { text: `${event.type}, ${event.date}`, callback_data: `EVENT_${event.id}_${value}` },
             ])
             reply_markup.inline_keyboard.push([
-              { text: "Назад", callback_data: 'HOME' },
+              { text: "Назад", callback_data: 'getCities' },
             ])
             text = "Текст про список ивентов"
             break;
