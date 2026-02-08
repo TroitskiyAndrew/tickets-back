@@ -29,7 +29,6 @@ const handleWebhook = async (req, res) => {
       let text = 'Рандомный текст';
       if (data === 'getCities') {
         const cities = await citiesService.getCities();
-        console.log(cities[0]);
         console.log(isAdmin)
         reply_markup.inline_keyboard = cities.map(city => [
           { text: `${city.name}(${city.events.map(event => event.date).join(', ')})`, callback_data: `CITY_${city.id}` },
@@ -98,7 +97,6 @@ const handleWebhook = async (req, res) => {
     //     });
     //   }
     // }
-    console.log(update)
 
 
     res.json({ ok: true });
