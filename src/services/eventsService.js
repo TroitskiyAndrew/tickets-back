@@ -12,9 +12,15 @@ async function getEvents() {
     return events;
 }
 
+async function getEvent(id) {
+    const events =  await dataService.getDocument('event', id);
+    return events;
+}
+
 
 
 module.exports = {
     getEvents: getEvents,
+    getEvent: getEvent,
     getEventsByCity: getEventsByCity,
 };

@@ -29,20 +29,45 @@ const handleWebhook = async (req, res) => {
       let text = 'Рандомный текст';
       if (data === 'getCities') {
         const cities = await citiesService.getCities();
-        console.log(isAdmin)
         reply_markup.inline_keyboard = cities.map(city => [
           { text: `${city.name}(${city.events.map(event => event.date).join(', ')})`, callback_data: `CITY_${city.id}` },
         ])
+        reply_markup.inline_keyboard.push([
+          { text: "Назад", callback_data: `HOME` },
+        ])
         text = "Текст про список городов"
       } else {
-        const [action, value] = data.split('_');
+        const [action, value, context] = data.split('_');
         switch (action) {
           case 'CITY': {
             const events = await eventsService.getEventsByCity(value);
             reply_markup.inline_keyboard = events.map(event => [
-              { text: `${event.type}, ${event.date}`, callback_data: `EVENT_${event.id}` },
+              { text: `${event.type}, ${event.date}`, callback_data: `EVENT_${event.id}_${value}` },
+            ])
+            reply_markup.inline_keyboard.push([
+              { text: "Назад", callback_data: 'HOME' },
             ])
             text = "Текст про список ивентов"
+            break;
+          }
+          case 'EVENT': {
+            const event = await eventsService.getEvent(value);
+            reply_markup.inline_keyboard = event.tickets.map(ticket => [
+              { text: `${ticket.type}, ${ticket.priceVND}`, callback_data: `TICKET_${ticket.type}` },
+            ])
+            reply_markup.inline_keyboard.push([
+              { text: "Назад", callback_data: `CITY_${context}` },
+            ])
+            text = "Текст про список билетов"
+            break;
+          }
+          case 'HOME': {
+            reply_markup.inline_keyboard = [
+              [
+                { text: "Список городов", callback_data: "getCities" },
+              ]
+            ]
+            text = "Добро пожаловать!"
             break;
           }
           default:
