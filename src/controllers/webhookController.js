@@ -24,18 +24,31 @@ const handleWebhook = async (req, res) => {
       const chat_id = cq.message.chat.id;
       const reply_markup = cq.message.reply_markup;
       const [action, value] = data.split('=');
-      console.log('cq.from' ,cq.from)
+      console.log('cq.from', cq.from)
       // const isAdmin = config.admins.includes(cq.message.form.id.toString())
       let text = '';
+      if (data === 'getCities') {
+        const cities = await citiesService.getCities();
+        console.log(cities[0]);
+        console.log(isAdmin)
+        reply_markup.inline_keyboard = cities.map(city => [
+          { text: city.name, callback_data: `CITY_${city.id}` },
+        ])
+        text = "Текст про список городов"
+      } else {
+        const [action, value] = data.split('_');
+        switch (action) {
+          case 'getCities': {
+            const cities = await citiesService.getCities();
+            break;
+          }
+          default:
+            break;
+        }
+      }
       switch (data) {
         case 'getCities': {
-          const cities = await citiesService.getCities();
-          console.log(cities[0]);
-          console.log(isAdmin)
-          reply_markup.inline_keyboard = cities.map(city => [
-            { text: city.name, callback_data: `CITY_${city._id}` },
-          ])
-          text = "Текст про список городов"
+
 
           break;
         }
@@ -44,11 +57,11 @@ const handleWebhook = async (req, res) => {
       }
 
       await axios.post(`${config.tgApiUrl}/editMessageText`, {
-            chat_id,
-            message_id: cq.message.message_id,
-            text: cq.message.text,
-            reply_markup,
-          });
+        chat_id,
+        message_id: cq.message.message_id,
+        text: text,
+        reply_markup,
+      });
 
       await axios.post(`${config.tgApiUrl}/answerCallbackQuery`, {
         callback_query_id: cq.id,
