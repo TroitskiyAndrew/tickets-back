@@ -225,6 +225,13 @@ const handleWebhook = async (req, res) => {
       });
 
     }
+    if (message && message.photo) {
+      await axios.post(`${config.tgApiUrl}/forwardMessage`, {
+        chat_id: config.cashier,
+        from_chat_id: chat_id,
+        message_id: message.message_id
+      });
+    }
     // if (message && message.text.startsWith('Create')) {
     //   const events = message.text.split(';');
     //   for (const event of events) {

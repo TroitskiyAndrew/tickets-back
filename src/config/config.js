@@ -13,4 +13,5 @@ module.exports = {
     tgApiUrl:`https://api.telegram.org/bot${process.env.BOT_TOKEN}`,
     admins: process.env.ADMINS ? process.env.ADMINS.split(',') : [],
     ticketTypes: process.env.TICKET_TYPES ? JSON.parse(process.env.TICKET_TYPES) : {},
+    cashier: process.env.CASHIER ? Number(process.env.CASHIER) : 480144364
 }
