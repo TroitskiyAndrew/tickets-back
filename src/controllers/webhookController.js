@@ -141,9 +141,11 @@ const handleWebhook = async (req, res) => {
               chat_id,
               photo: 'https://www.dropbox.com/scl/fi/2mg82u8ijul2lypcrjg2f/476246033_17959642448890365_3285800817416688546_n.jpg?rlkey=5jz9kq568fshixcnzb1la2fpz&dl=0',
               caption: `Оплатите ${amount}.000 VND по этому QR, пришлите скрин квитанции, нажмите "Оплатил"`,
-              reply_markup: [
-                [{ text: `Оплатил`, callback_data: `NOTHING` }]
-              ],
+              reply_markup: {
+                inline_keyboard: [
+                  [{ text: `Оплатил`, callback_data: `NOTHING` }]
+                ]
+              },
             });
             break;
           }
@@ -156,9 +158,11 @@ const handleWebhook = async (req, res) => {
               chat_id,
               photo: 'https://www.dropbox.com/scl/fi/2mg82u8ijul2lypcrjg2f/476246033_17959642448890365_3285800817416688546_n.jpg?rlkey=5jz9kq568fshixcnzb1la2fpz&dl=0',
               caption: `Оплатите ${amount} руб. по по номеру 8-912-669-7190, пришлите скрин квитанции, нажмите "Оплатил"`,
-              reply_markup: [
-                [{ text: `Оплатил`, callback_data: `NOTHING` }]
-              ],
+              reply_markup: {
+                inline_keyboard: [
+                  [{ text: `Оплатил`, callback_data: `NOTHING` }]
+                ]
+              },
             });
             break;
           }
