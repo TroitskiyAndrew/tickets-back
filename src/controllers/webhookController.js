@@ -30,7 +30,7 @@ const handleWebhook = async (req, res) => {
       if (data === 'getCities') {
         const cities = await citiesService.getCities();
         reply_markup.inline_keyboard = cities.map(city => [
-          { text: `${city.name}(${city.events.map(event => event.date).join(', ')})`, callback_data: `CITY_${city.id}` },
+          { text: `${city.name} (${city.events.map(event => event.date).join(', ')})`, callback_data: `CITY_${city.id}` },
         ])
         reply_markup.inline_keyboard.push([
           { text: "Назад", callback_data: `HOME` },
@@ -53,7 +53,7 @@ const handleWebhook = async (req, res) => {
           case 'EVENT': {
             const event = await eventsService.getEvent(value);
             const state = stateStr ? stateStr.split(',') : event.tickets.map(() => 0);
-            state.push(0,0)
+            state.push(0, 0)
             reply_markup.inline_keyboard = event.tickets.reduce((rows, ticket) => {
               rows.push([
                 { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет'}, ${ticket.priceVND}.000 VND/${ticket.priceRub} руб`, callback_data: `TICKET_${ticket.type}` }
@@ -83,18 +83,18 @@ const handleWebhook = async (req, res) => {
               row[2].callback_data = `INCR_${value}_${index}_${state.join(',')}`;
             });
             const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
-            const [totalVND , totalRub] = event.tickets.reduce((res, ticket) => {
-              res[0]+= state[ticket.type] * ticket.priceVND;
-              res[1]+= state[ticket.type] * ticket.priceRub;
+            const [totalVND, totalRub] = event.tickets.reduce((res, ticket) => {
+              res[0] += state[ticket.type] * ticket.priceVND;
+              res[1] += state[ticket.type] * ticket.priceRub;
               return res;
-            }, [0,0]);
-            reply_markup.inline_keyboard.length = event.tickets.length*2;
-            if(totalVND > 0) {
+            }, [0, 0]);
+            reply_markup.inline_keyboard.length = event.tickets.length * 2;
+            if (totalVND > 0) {
               reply_markup.inline_keyboard.push([
-                { text: `Купить за ${totalVND}.000 VND`, callback_data: "NOTHING" },
+                { text: `Купить за ${totalVND}.000 VND`, callback_data: `VND_${value}_${totalVND}_${state.join(',')}` },
               ])
               reply_markup.inline_keyboard.push([
-                { text: `Купить за ${totalRub} руб`, callback_data: "NOTHING" },
+                { text: `Купить за ${totalRub} руб`, callback_data: `RUB_${value}_${totalRub}_${state.join(',')}` },
               ])
             }
             reply_markup.inline_keyboard.push(backButton)
@@ -114,22 +114,51 @@ const handleWebhook = async (req, res) => {
               row[2].callback_data = `INCR_${value}_${index}_${state.join(',')}`;
             });
             const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
-            const [totalVND , totalRub] = event.tickets.reduce((res, ticket) => {
-              res[0]+= state[ticket.type] * ticket.priceVND;
-              res[1]+= state[ticket.type] * ticket.priceRub;
+            const [totalVND, totalRub] = event.tickets.reduce((res, ticket) => {
+              res[0] += state[ticket.type] * ticket.priceVND;
+              res[1] += state[ticket.type] * ticket.priceRub;
               return res;
-            }, [0,0]);
-            reply_markup.inline_keyboard.length = event.tickets.length*2;
-            if(totalVND > 0) {
+            }, [0, 0]);
+            reply_markup.inline_keyboard.length = event.tickets.length * 2;
+            if (totalVND > 0) {
               reply_markup.inline_keyboard.push([
-                { text: `Купить за ${totalVND}.000 VND`, callback_data: "NOTHING" },
+                { text: `Купить за ${totalVND}.000 VND`, callback_data: `VND_${value}_${totalVND}_${state.join(',')}` },
               ])
               reply_markup.inline_keyboard.push([
-                { text: `Купить за ${totalRub} руб`, callback_data: "NOTHING" },
+                { text: `Купить за ${totalRub} руб`, callback_data: `RUB_${value}_${totalRub}_${state.join(',')}` },
               ])
             }
             reply_markup.inline_keyboard.push(backButton)
-           text += "\u200B";
+            text += "\u200B";
+            break;
+          }
+          case 'VND': {
+            const event = await eventsService.getEvent(value);
+            const state = stateStr ? stateStr.split(',').map(Number) : event.tickets.map(() => 0);
+            const amount = Number(context);
+            const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
+            reply_markup.inline_keyboard = [backButton];
+            text += "\u200B";
+            await axios.post(`${config.tgApiUrl}/sendPhoto`, {
+              chat_id,
+              photo: 'https://www.dropbox.com/scl/fi/2mg82u8ijul2lypcrjg2f/476246033_17959642448890365_3285800817416688546_n.jpg?rlkey=5jz9kq568fshixcnzb1la2fpz&dl=0',
+              caption: `Оплатите ${amount}.000 VND по этому QR и пришлите скан квитанции`,
+              reply_markup,
+            });
+            break;
+          }
+          case 'RUB': {
+            const event = await eventsService.getEvent(value);
+            const state = stateStr ? stateStr.split(',').map(Number) : event.tickets.map(() => 0);
+            const amount = Number(context);
+            const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
+            reply_markup.inline_keyboard = [backButton];
+            text += "\u200B";
+            await axios.post(`${config.tgApiUrl}/sendMessage`, {
+              chat_id,
+              text: `Оплатите ${amount} руб. по по номеру 8-912-669-7190`,
+              reply_markup,
+            });
             break;
           }
           case 'HOME': {
