@@ -143,7 +143,8 @@ const handleWebhook = async (req, res) => {
               caption: `Оплатите ${amount}.000 VND по этому QR, пришлите скрин квитанции, нажмите "Оплатил"`,
               reply_markup: {
                 inline_keyboard: [
-                  [{ text: `Оплатил`, callback_data: `NOTHING` }]
+                  [{ text: `Оплатил`, callback_data: `PAYED_${value}_VND_${state.join(',')}` }],
+                  [{ text: `Назад`, callback_data: `CANCEL-PAYMENT` }],
                 ]
               },
             });
@@ -160,9 +161,18 @@ const handleWebhook = async (req, res) => {
               caption: `Оплатите ${amount} руб. по по номеру 8-912-669-7190, пришлите скрин квитанции, нажмите "Оплатил"`,
               reply_markup: {
                 inline_keyboard: [
-                  [{ text: `Оплатил`, callback_data: `NOTHING` }]
+                  [{ text: `Оплатил`, callback_data: `PAYED_${value}_RUB_${state.join(',')}` }],
+                  [{ text: `Назад`, callback_data: `CANCEL-PAYMENT` }],
                 ]
               },
+            });
+            break;
+          }
+          case 'CANCEL-PAYMENT': {
+            emptyButton = true;
+            await axios.post(`${config.tgApiUrl}/deleteMessage`, {
+              chat_id,
+              message_id: cq.message.message_id,
             });
             break;
           }
@@ -176,7 +186,7 @@ const handleWebhook = async (req, res) => {
             break;
           }
           default:
-            emptyButton = true
+            emptyButton = true;
             break;
         }
       }
