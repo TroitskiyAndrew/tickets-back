@@ -136,7 +136,7 @@ const handleWebhook = async (req, res) => {
             const event = await eventsService.getEvent(value);
             const state = stateStr ? stateStr.split(',').map(Number) : event.tickets.map(() => 0);
             const amount = Number(context);
-            text += "\u200B";
+            emptyButton = true;
             await axios.post(`${config.tgApiUrl}/sendPhoto`, {
               chat_id,
               photo: 'https://www.dropbox.com/scl/fi/2mg82u8ijul2lypcrjg2f/476246033_17959642448890365_3285800817416688546_n.jpg?rlkey=5jz9kq568fshixcnzb1la2fpz&dl=0',
@@ -151,7 +151,7 @@ const handleWebhook = async (req, res) => {
             const event = await eventsService.getEvent(value);
             const state = stateStr ? stateStr.split(',').map(Number) : event.tickets.map(() => 0);
             const amount = Number(context);
-            text += "\u200B";
+            emptyButton = true;
             await axios.post(`${config.tgApiUrl}/sendPhoto`, {
               chat_id,
               photo: 'https://www.dropbox.com/scl/fi/2mg82u8ijul2lypcrjg2f/476246033_17959642448890365_3285800817416688546_n.jpg?rlkey=5jz9kq568fshixcnzb1la2fpz&dl=0',
