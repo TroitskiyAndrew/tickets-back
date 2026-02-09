@@ -136,14 +136,14 @@ const handleWebhook = async (req, res) => {
             const event = await eventsService.getEvent(value);
             const state = stateStr ? stateStr.split(',').map(Number) : event.tickets.map(() => 0);
             const amount = Number(context);
-            const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
-            reply_markup.inline_keyboard = [backButton];
             text += "\u200B";
             await axios.post(`${config.tgApiUrl}/sendPhoto`, {
               chat_id,
               photo: 'https://www.dropbox.com/scl/fi/2mg82u8ijul2lypcrjg2f/476246033_17959642448890365_3285800817416688546_n.jpg?rlkey=5jz9kq568fshixcnzb1la2fpz&dl=0',
               caption: `Оплатите ${amount}.000 VND по этому QR, пришлите скрин квитанции, нажмите "Оплатил"`,
-              reply_markup,
+              reply_markup: [
+                [{ text: `Оплатил`, callback_data: `NOTHING` }]
+              ],
             });
             break;
           }
@@ -151,13 +151,14 @@ const handleWebhook = async (req, res) => {
             const event = await eventsService.getEvent(value);
             const state = stateStr ? stateStr.split(',').map(Number) : event.tickets.map(() => 0);
             const amount = Number(context);
-            const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
-            reply_markup.inline_keyboard = [backButton];
             text += "\u200B";
-            await axios.post(`${config.tgApiUrl}/sendMessage`, {
+            await axios.post(`${config.tgApiUrl}/sendPhoto`, {
               chat_id,
-              text: `Оплатите ${amount} руб. по по номеру 8-912-669-7190, пришлите скрин квитанции, нажмите "Оплатил"`,
-              reply_markup,
+              photo: 'https://www.dropbox.com/scl/fi/2mg82u8ijul2lypcrjg2f/476246033_17959642448890365_3285800817416688546_n.jpg?rlkey=5jz9kq568fshixcnzb1la2fpz&dl=0',
+              caption: `Оплатите ${amount} руб. по по номеру 8-912-669-7190, пришлите скрин квитанции, нажмите "Оплатил"`,
+              reply_markup: [
+                [{ text: `Оплатил`, callback_data: `NOTHING` }]
+              ],
             });
             break;
           }
