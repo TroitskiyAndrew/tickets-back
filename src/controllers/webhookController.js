@@ -188,9 +188,11 @@ const handleWebhook = async (req, res) => {
           case 'PAYED': {
             const event = await eventsService.getEvent(value);
             const state = stateMap.get(userId);
+            console.log('state', state)
             const bookingId = crypto.randomUUID();
             const tickets = event.tickets.reduce((res, ticket) => {
               const count = state[ticket.type.toString()];
+              console.log('count', count)
               if (count > 0) {
                 res.push({
                   userId,
@@ -206,6 +208,7 @@ const handleWebhook = async (req, res) => {
               }
               return res;
             }, []);
+            console.log('tickets', tickets)
             await dataService.createDocuments('ticket', tickets);
             reply_markup.inline_keyboard = [
               [
