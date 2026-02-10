@@ -5,6 +5,7 @@ const QRCode = require("qrcode");
 const crypto = require("crypto");
 const config = require("../config/config");
 const axios = require("axios");
+const FormData = require("form-data");
 const { ObjectId } = require("mongodb");
 const { sendMessage } = require("../services/messageService");
 
@@ -82,10 +83,10 @@ const handleWebhook = async (req, res) => {
           case 'INCR': {
             const event = await eventsService.getEvent(value);
             const state = stateMap.get(userId);
-            const bookedTickets = await dataService.getDocuments('ticket', {event: event.id, type: context, confirmed: true});
+            const bookedTickets = await dataService.getDocuments('ticket', { event: event.id, type: context, confirmed: true });
             const availableTickets = event.tickets.find(ticket => ticket.type === Number(context)).count - bookedTickets.length;
             const currentCount = state[context] || 0;
-            if(availableTickets < currentCount){
+            if (availableTickets < currentCount) {
               responseText = 'Вы выбрали максимальное доступное кол-во билетов'
             }
             let count = Math.min(currentCount + 1, availableTickets);
@@ -125,10 +126,10 @@ const handleWebhook = async (req, res) => {
               emptyButton = true;
               break;
             }
-            const bookedTickets = await dataService.getDocuments('ticket', {event: event.id, type: context, confirmed: true});
+            const bookedTickets = await dataService.getDocuments('ticket', { event: event.id, type: context, confirmed: true });
             const availableTickets = event.tickets.find(ticket => ticket.type === Number(context)).count - bookedTickets.length;
             const currentCount = state[context] || 0;
-            let count = Math.min(currentCount -1, availableTickets);
+            let count = Math.min(currentCount - 1, availableTickets);
             state[context] = count;
             let i = 0
             for (const row of reply_markup.inline_keyboard) {
@@ -230,23 +231,17 @@ const handleWebhook = async (req, res) => {
             for (const ticket of tickets) {
               const event = await eventsService.getEvent(ticket.event);
               const link = `${config.ticketUrlBase}${ticket.id}`;
-              const qrDataUrl = await QRCode.toDataURL(link, {
-                type: 'image/png',
+              const qrBuffer = await QRCode.toBuffer(link, {
+                type: 'png',
                 width: 512,
                 margin: 2,
               });
-              await axios.post(`${config.tgApiUrl}/sendPhoto`, {
-                chat_id: ticket.userId,
-                photo: qrDataUrl,
-                caption: `Ваш билет на ${config.ticketTypes[ticket.type.toString()]} ${event.date}`,
-                reply_markup: {
-                  inline_keyboard: [
-                    [
-                      { text: "Список городов", callback_data: "getCities" },
-                    ]
-                  ]
-                },
-              });
+              const form = new FormData();
+              form.append('chat_id', ticket.userId);
+              form.append('photo', qrBuffer, { filename: 'qr.png' });
+              form.append('caption', `Ваш билет на ${config.ticketTypes[ticket.type.toString()]} ${event.date}`);
+
+              await axios.post(`${config.tgApiUrl}/sendPhoto`, form);
             }
 
             break;
