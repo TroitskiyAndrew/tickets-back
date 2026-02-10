@@ -53,11 +53,13 @@ const handleWebhook = async (req, res) => {
             reply_markup.inline_keyboard.push([
               { text: "Назад", callback_data: 'getCities' },
             ])
-            text = "Текст про список ивентов"
+            text = "Текст про список ивентов";
+            newPhoto = config.mainImage;
             break;
           }
           case 'EVENT': {
             const event = await eventsService.getEvent(value);
+            newPhoto = event.schema;
             const state = {
               event: value,
             }
@@ -204,6 +206,7 @@ const handleWebhook = async (req, res) => {
             }, []);
             await dataService.createDocuments('ticket', tickets);
             text = "Ожидайте подтверждения платежа"
+            newPhoto = config.wait;
             reply_markup.inline_keyboard = [
               [
                 { text: "На главную", callback_data: "HOME" },
@@ -268,6 +271,7 @@ const handleWebhook = async (req, res) => {
                 { text: "Список городов", callback_data: "getCities" },
               ]
             ]
+            newPhoto = config.mainImage
             text = "Добро пожаловать!"
             break;
           }

@@ -18,5 +18,6 @@ module.exports = {
     vndQR: process.env.VND_QR || 'https://www.dropbox.com/scl/fi/5mnlymj9q1sbl69ydyqth/vndQR.jpg?rlkey=lo095u7dl181eq7lxgah6x868&dl=0',
     rubQR: process.env.RUB_QR || 'https://www.dropbox.com/scl/fi/h9q90ybkyi8te4a4dj6a4/rubQR.jpg?rlkey=hb1kax5319wa2qkdznprxwqbx&dl=0',
     rubAccount: process.env.RUB_ACCOUNT || 'по номеру 89126697190 на АльфаБанк',
-    mainImage: process.env.MAIN_IMAGE || 'https://www.dropbox.com/scl/fi/effyav2xjnlc8rvdg5x56/main.jpeg?rlkey=073r242acvcathoutqiqipwyu&dl=0'
+    mainImage: process.env.MAIN_IMAGE || 'https://www.dropbox.com/scl/fi/effyav2xjnlc8rvdg5x56/main.jpeg?rlkey=073r242acvcathoutqiqipwyu&dl=0',
+    wait: process.env.WAIT || 'https://www.dropbox.com/scl/fi/gll6m7uuzwi37cb6379bl/zhdun.jpg?rlkey=xmm48wmk0ri4ckudm5bde23ez&dl=0'
 }
