@@ -83,14 +83,14 @@ const handleWebhook = async (req, res) => {
             state[context] = (state[context] || 0) + 1;
             let i = 0
             for (const row of reply_markup.inline_keyboard) {
-              if(row.length === 3){
+              if (row.length === 3) {
                 i += 2;
                 const [action, value, ticketType] = row[0].callback_data.split('_');
                 row[1].text = state[ticketType] || 0
               }
             }
             const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
-            const [totalVND, totalRub] = event.tickets.reduce((res, ticket) => {            
+            const [totalVND, totalRub] = event.tickets.reduce((res, ticket) => {
               res[0] += (state[ticket.type.toString()] ?? 0) * ticket.priceVND;
               res[1] += (state[ticket.type.toString()] ?? 0) * ticket.priceRub;
               console.log('res', res)
@@ -119,7 +119,7 @@ const handleWebhook = async (req, res) => {
             state[context] = state[context] - 1;
             let i = 0
             for (const row of reply_markup.inline_keyboard) {
-              if(row.length === 3){
+              if (row.length === 3) {
                 i += 2;
                 const [action, value, ticketType] = row[0].callback_data.split('_');
                 row[1].text = state[ticketType] || 0
@@ -224,28 +224,30 @@ const handleWebhook = async (req, res) => {
 
 
     }
-    const message = update.message
-    if (message && message.text === "/start") {
-      await axios.post(`${config.tgApiUrl}/sendPhoto`, {
-        chat_id: message.chat.id,
-        photo: 'https://www.dropbox.com/scl/fi/2mg82u8ijul2lypcrjg2f/476246033_17959642448890365_3285800817416688546_n.jpg?rlkey=5jz9kq568fshixcnzb1la2fpz&dl=0',
-        caption: "Добро пожаловать!",
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: "Список городов", callback_data: "getCities" },
+    const message = update.message;
+    if (message) {
+      if (message.text === "/start") {
+        await axios.post(`${config.tgApiUrl}/sendPhoto`, {
+          chat_id: message.chat.id,
+          photo: 'https://www.dropbox.com/scl/fi/2mg82u8ijul2lypcrjg2f/476246033_17959642448890365_3285800817416688546_n.jpg?rlkey=5jz9kq568fshixcnzb1la2fpz&dl=0',
+          caption: "Добро пожаловать!",
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: "Список городов", callback_data: "getCities" },
+              ]
             ]
-          ]
-        },
-      });
-    }
-    if (message && message.photo) {
-      await axios.post(`${config.tgApiUrl}/forwardMessage`, {
+          },
+        });
+      } else {
+        await axios.post(`${config.tgApiUrl}/forwardMessage`, {
         chat_id: config.cashier,
         from_chat_id: message.chat.id,
         message_id: message.message_id
       });
+      }
     }
+
     // if (message && message.text.startsWith('Create')) {
     //   const events = message.text.split(';');
     //   for (const event of events) {
