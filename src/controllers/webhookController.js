@@ -2,7 +2,7 @@ const dataService = require("../services/mongodb");
 const citiesService = require("../services/citiesService");
 const eventsService = require("../services/eventsService");
 const membersService = require("../services/membersService");
-import crypto from 'crypto';
+const crypto = require("crypto");
 const config = require("../config/config");
 const axios = require("axios");
 const { ObjectId } = require("mongodb");
