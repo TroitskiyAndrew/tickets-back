@@ -90,12 +90,9 @@ const handleWebhook = async (req, res) => {
               }
             }
             const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
-            const [totalVND, totalRub] = event.tickets.reduce((res, ticket) => {
-              console.log('state', state)
-              console.log('ticketType', ticket.type)
-              console.log('count', state[ticket.type.toString()])              
-              res[0] += state[ticket.type.toString()] * ticket.priceVND;
-              res[1] += state[ticket.type.toString()] * ticket.priceRub;
+            const [totalVND, totalRub] = event.tickets.reduce((res, ticket) => {            
+              res[0] += (state[ticket.type.toString()] ?? 0) * ticket.priceVND;
+              res[1] += (state[ticket.type.toString()] ?? 0) * ticket.priceRub;
               console.log('res', res)
               return res;
             }, [0, 0]);
@@ -130,8 +127,8 @@ const handleWebhook = async (req, res) => {
             }
             const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
             const [totalVND, totalRub] = event.tickets.reduce((res, ticket) => {
-              res[0] += state[ticket.type.toString()] * ticket.priceVND;
-              res[1] += state[ticket.type.toString()] * ticket.priceRub;
+              res[0] += (state[ticket.type.toString()] ?? 0) * ticket.priceVND;
+              res[1] += (state[ticket.type.toString()] ?? 0) * ticket.priceRub;
               return res;
             }, [0, 0]);
             reply_markup.inline_keyboard.length = event.tickets.length * 2;
