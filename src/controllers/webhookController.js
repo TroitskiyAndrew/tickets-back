@@ -41,7 +41,7 @@ const handleWebhook = async (req, res) => {
         reply_markup.inline_keyboard.push([
           { text: "Назад", callback_data: `HOME` },
         ])
-        text = "Текст про список городов";
+        text = "Выберите город";
       } else {
         const [action, value, context] = data.split('_');
         switch (action) {
@@ -53,7 +53,7 @@ const handleWebhook = async (req, res) => {
             reply_markup.inline_keyboard.push([
               { text: "Назад", callback_data: 'getCities' },
             ])
-            text = "Текст про список ивентов";
+            text = "Выберите одно из мероприятий";
             newPhoto = config.mainImage;
             break;
           }
@@ -79,7 +79,7 @@ const handleWebhook = async (req, res) => {
             reply_markup.inline_keyboard.push([
               { text: "Назад", callback_data: `CITY_${event.city}` },
             ])
-            text = "Текст про список билетов"
+            text = "Выберите билеты"
             break;
           }
           case 'INCR': {
@@ -265,10 +265,39 @@ const handleWebhook = async (req, res) => {
             });
             break;
           }
+          case 'MY-TICKETS': {
+            const tickets = await dataService.getDocuments('ticket', { userId });
+            text = 'Подтверждено: ' + text;
+            for (const ticket of tickets) {
+              const event = await eventsService.getEvent(ticket.event);
+              if (ticket.confirmed) {
+                const link = `${config.ticketUrlBase}${ticket.id}`;
+                const qrBuffer = await QRCode.toBuffer(link, {
+                  type: 'png',
+                  width: 512,
+                  margin: 2,
+                });
+                const form = new FormData();
+                form.append('chat_id', ticket.userId);
+                form.append('photo', qrBuffer, { filename: 'qr.png' });
+                form.append('caption', `Ваш билет на ${event.type} ${event.date}`);
+
+                await axios.post(`${config.tgApiUrl}/sendPhoto`, form);
+              } else {
+                await axios.post(`${config.tgApiUrl}/sendMessage`, {
+                  chat_id: ticket.userId,
+                  text: `Ваш билет на ${event.type} ${event.date} ожидает подтверждения оплаты`
+                });
+              }
+            }
+
+            break;
+          }
           case 'HOME': {
             reply_markup.inline_keyboard = [
               [
-                { text: "Список городов", callback_data: "getCities" },
+                { text: "Города тура", callback_data: "getCities" },
+                { text: "Мои билеты", callback_data: "MY-TICKETS" },
               ]
             ]
             newPhoto = config.mainImage
@@ -335,7 +364,8 @@ const handleWebhook = async (req, res) => {
           reply_markup: {
             inline_keyboard: [
               [
-                { text: "Список городов", callback_data: "getCities" },
+                { text: "Города тура", callback_data: "getCities" },
+                { text: "Мои билеты", callback_data: "MY-TICKETS" },
               ]
             ]
           },
