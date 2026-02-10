@@ -84,10 +84,10 @@ const handleWebhook = async (req, res) => {
             const state = stateMap.get(userId);
             const bookedTickets = await dataService.getDocuments('ticket', {event: event.id, type: context, confirmed: true});
             const availableTickets = event.tickets.find(ticket => ticket.type === Number(context)).count - bookedTickets.length;
+            const currentCount = state[context] || 0;
             if(availableTickets < currentCount){
               responseText = 'Вы выбрали максимальное доступное кол-во билетов'
             }
-            const currentCount = state[context] || 0;
             let count = Math.min(currentCount + 1, availableTickets);
             state[context] = count;
             let i = 0
@@ -125,7 +125,11 @@ const handleWebhook = async (req, res) => {
               emptyButton = true;
               break;
             }
-            state[context] = state[context] - 1;
+            const bookedTickets = await dataService.getDocuments('ticket', {event: event.id, type: context, confirmed: true});
+            const availableTickets = event.tickets.find(ticket => ticket.type === Number(context)).count - bookedTickets.length;
+            const currentCount = state[context] || 0;
+            let count = Math.min(currentCount -1, availableTickets);
+            state[context] = count;
             let i = 0
             for (const row of reply_markup.inline_keyboard) {
               if (row.length === 3) {
