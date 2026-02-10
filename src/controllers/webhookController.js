@@ -188,13 +188,11 @@ const handleWebhook = async (req, res) => {
           case 'PAYED': {
             const event = await eventsService.getEvent(value);
             const state = stateMap.get(userId);
-            console.log('state', state)
             const bookingId = crypto.randomBytes(10).toString('base64url');
             const tickets = event.tickets.reduce((res, ticket) => {
-              const count = state[ticket.type.toString()];
-              console.log('count', count)
+              const count = state[ticket.type.toString()] || 0;
               if (count > 0) {
-                res.push({
+                arr.push(...Array(count).fill({
                   userId,
                   event: event.id,
                   bookingId,
@@ -204,11 +202,10 @@ const handleWebhook = async (req, res) => {
                   price: context === 'VND' ? ticket.priceVND : ticket.priceRUB,
                   cashier: config.cashier,
                   confirmed: false,
-                })
+                }))
               }
               return res;
             }, []);
-            console.log('tickets', tickets)
             await dataService.createDocuments('ticket', tickets);
             reply_markup.inline_keyboard = [
               [
