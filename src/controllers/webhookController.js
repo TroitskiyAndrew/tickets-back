@@ -7,6 +7,7 @@ const config = require("../config/config");
 const axios = require("axios");
 const { ObjectId } = require("mongodb");
 const { sendMessage } = require("../services/messageService");
+import QRCode from 'qrcode';
 
 const stateMap = new Map()
 
@@ -174,7 +175,7 @@ const handleWebhook = async (req, res) => {
               const count = state[ticket.type.toString()] || 0;
               if (count > 0) {
                 res.push(...Array(count).fill({
-                  userId,
+                  userId: Number(userId),
                   event: event.id,
                   bookingId,
                   type: ticket.type,
@@ -197,7 +198,7 @@ const handleWebhook = async (req, res) => {
             const userLink = `<a href="tg://user?id=${cq.from.id}">${cq.from.first_name || 'Пользователь'}</a>`;
             await axios.post(`${config.tgApiUrl}/sendMessage`, {
               chat_id: config.cashier,
-              text: `Оплата от ${userLink} на сумму ${tickets.reduce((acc, ticket) => acc += ticket.price, 0)}${context === 'VND' ? '.000 VND' : ' руб'} за ${tickets.length} билетов`,
+              text: `Оплата от ${userLink} на сумму ${tickets.reduce((acc, ticket) => acc += ticket.price, 0)}${context === 'VND' ? '.000 VND' : ' руб'} за ${tickets.length} билет${tickets.length === 1 ? '' : tickets.length <= 4 ? 'а' : 'ов'} на ${event.date}`,
               parse_mode: 'HTML',
               reply_markup: {
                 inline_keyboard: [
@@ -207,15 +208,36 @@ const handleWebhook = async (req, res) => {
                 ]
               }
             });
-           
+
             break;
           }
           case 'CONFIRM': {
-            const tickets = await dataService.getDocumentByQuery('ticket', {bookingId: value});
-            console.log(value, tickets)
-            await dataService.updateDocuments("ticket", {bookingId: value}, { $set: { confirmed: true } });
+            const tickets = await dataService.getDocumentByQuery('ticket', { bookingId: value });
+            await dataService.updateDocuments("ticket", { bookingId: value }, { $set: { confirmed: true } });
             reply_markup.inline_keyboard = []
             text = 'Подтверждено: ' + text;
+            for (const ticket of tickets) {
+              const event = await eventsService.getEvent(value);
+              const link = `${ticketUrlBase}${ticket.id}`;
+              const qrDataUrl = await QRCode.toDataURL(link, {
+                type: 'image/png',
+                width: 512,
+                margin: 2,
+              });
+              await axios.post(`${config.tgApiUrl}/sendPhoto`, {
+                chat_id: ticket.userId,
+                photo: qrDataUrl,
+                caption: `Ваш билет на ${config.ticketTypes[ticket.type.toString()]} ${event.date}`,
+                reply_markup: {
+                  inline_keyboard: [
+                    [
+                      { text: "Список городов", callback_data: "getCities" },
+                    ]
+                  ]
+                },
+              });
+            }
+
             break;
           }
           case 'WRONG': {
@@ -224,7 +246,7 @@ const handleWebhook = async (req, res) => {
             break;
           }
           case 'DROP': {
-            await dataService.deleteDocumentsByQuery('ticket', {bookingId: value});
+            await dataService.deleteDocumentsByQuery('ticket', { bookingId: value });
             reply_markup.inline_keyboard = []
             text = 'Не пришел платеж: ' + text;
             break;
@@ -251,7 +273,8 @@ const handleWebhook = async (req, res) => {
             media: {
               type: 'photo',
               media: newPhoto,
-              caption: text
+              caption: text,
+              parse_mode: 'HTML'
             },
             reply_markup,
           });
@@ -259,11 +282,12 @@ const handleWebhook = async (req, res) => {
         } else {
           const msg = cq.message;
           const hasPhoto = Array.isArray(msg.photo) && msg.photo.length > 0;
-          if(hasPhoto){
+          if (hasPhoto) {
             await axios.post(`${config.tgApiUrl}/editMessageCaption`, {
               chat_id,
               message_id: cq.message.message_id,
               caption: text,
+              parse_mode: 'HTML',
               reply_markup,
             });
 
@@ -272,6 +296,7 @@ const handleWebhook = async (req, res) => {
               chat_id,
               message_id: cq.message.message_id,
               text,
+              parse_mode: 'HTML',
               reply_markup,
             });
           }
