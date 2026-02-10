@@ -266,6 +266,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'MY-TICKETS': {
             const tickets = await dataService.getDocuments('ticket', { userId });
+            console.log(userId, tickets);
             emptyButton = true;
             for (const ticket of tickets) {
               const event = await eventsService.getEvent(ticket.event);
