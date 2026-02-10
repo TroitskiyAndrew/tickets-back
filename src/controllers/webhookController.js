@@ -166,6 +166,7 @@ const handleWebhook = async (req, res) => {
               [{ text: `Назад`, callback_data: `EVENT_${value}` }],
             ]
             text = `Оплатите ${amount}.000 VND по этому QR, пришлите скрин квитанции, нажмите "Оплатил"`;
+            newPhoto = config.vndQR;
             break;
           }
           case 'RUB': {
@@ -176,7 +177,8 @@ const handleWebhook = async (req, res) => {
               [{ text: `Оплатил`, callback_data: `PAYED_${value}_RUB` }],
               [{ text: `Назад`, callback_data: `EVENT_${value}` }],
             ]
-            text = `Оплатите ${amount} руб. по по номеру 8-912-669-7190, пришлите скрин квитанции, нажмите "Оплатил"`;
+            text = `Оплатите ${amount} руб. ${config.rubAccount}, пришлите скрин квитанции, нажмите "Оплатил"`;
+            newPhoto = config.rubQR;
             break;
           }
           case 'PAYED': {
@@ -239,7 +241,7 @@ const handleWebhook = async (req, res) => {
               const form = new FormData();
               form.append('chat_id', ticket.userId);
               form.append('photo', qrBuffer, { filename: 'qr.png' });
-              form.append('caption', `Ваш билет на ${config.ticketTypes[ticket.type.toString()]} ${event.date}`);
+              form.append('caption', `Ваш билет на ${event.type} ${event.date}`);
 
               await axios.post(`${config.tgApiUrl}/sendPhoto`, form);
             }
@@ -252,9 +254,12 @@ const handleWebhook = async (req, res) => {
             break;
           }
           case 'DROP': {
+            const tickets = await dataService.getDocuments('ticket', { bookingId: value });
             await dataService.deleteDocumentsByQuery('ticket', { bookingId: value });
-            reply_markup.inline_keyboard = []
-            text = 'Не пришел платеж: ' + text;
+            await axios.post(`${config.tgApiUrl}/sendMessage`, {
+              chat_id: tickets[0].userId,
+              test: "Менеджер не получил вашу оплату. Напишите сообщение, чтобы уточнить детали",
+            });
             break;
           }
           case 'HOME': {
@@ -321,7 +326,7 @@ const handleWebhook = async (req, res) => {
       if (message.text === "/start") {
         await axios.post(`${config.tgApiUrl}/sendPhoto`, {
           chat_id: message.chat.id,
-          photo: 'https://www.dropbox.com/scl/fi/2mg82u8ijul2lypcrjg2f/476246033_17959642448890365_3285800817416688546_n.jpg?rlkey=5jz9kq568fshixcnzb1la2fpz&dl=0',
+          photo: config.mainImage,
           caption: "Добро пожаловать!",
           reply_markup: {
             inline_keyboard: [
