@@ -31,6 +31,7 @@ const handleWebhook = async (req, res) => {
       isAdmin = config.admins.includes(userId)
       let text = cq.message.caption || cq.message.text + "\u200B";
       let newPhoto;
+      let responseText;
       if (data === 'getCities') {
         const cities = await citiesService.getCities();
         reply_markup.inline_keyboard = cities.map(city => [
@@ -81,7 +82,14 @@ const handleWebhook = async (req, res) => {
           case 'INCR': {
             const event = await eventsService.getEvent(value);
             const state = stateMap.get(userId);
-            state[context] = (state[context] || 0) + 1;
+            const bookedTickets = await dataService.getDocuments('ticket', {event: event.id, type: context, confirmed: true});
+            const availableTickets = event.tickets.find(ticket => ticket.type === Number(context)).count - bookedTickets.length;
+            if(availableTickets < currentCount){
+              responseText = 'Вы выбрали максимальное доступное кол-во билетов'
+            }
+            const currentCount = state[context] || 0;
+            let count = Math.min(currentCount + 1, availableTickets);
+            state[context] = count;
             let i = 0
             for (const row of reply_markup.inline_keyboard) {
               if (row.length === 3) {
@@ -211,7 +219,7 @@ const handleWebhook = async (req, res) => {
             break;
           }
           case 'CONFIRM': {
-            const tickets = await dataService.getDocumentByQuery('ticket', { bookingId: value });
+            const tickets = await dataService.getDocuments('ticket', { bookingId: value });
             await dataService.updateDocuments("ticket", { bookingId: value }, { $set: { confirmed: true } });
             reply_markup.inline_keyboard = []
             text = 'Подтверждено: ' + text;
@@ -304,7 +312,7 @@ const handleWebhook = async (req, res) => {
 
       await axios.post(`${config.tgApiUrl}/answerCallbackQuery`, {
         callback_query_id: cq.id,
-        // text: responseText
+        text: responseText
       });
 
 
