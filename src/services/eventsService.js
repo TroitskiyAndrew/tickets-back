@@ -13,8 +13,10 @@ async function getEvents() {
         return eventsCache;
     }
     const events =  await dataService.getDocuments('event', {});
-    await dataService.updateDocuments('event', {}, {$set: {schema: 'https://www.dropbox.com/scl/fi/z29w9zt27ics999tqoyxo/.png?rlkey=pk9dsz6ufjmikfszuwffr220g&dl=0'}})
-    await dataService.updateDocuments('place', {}, {$set: {map: 'https://maps.app.goo.gl/65BzsaNqLUEsgMkQ6'}})
+    for (const event of events){
+        event.tickets[4].priceVND = 1000
+        await dataService.updateDocument('event', event)
+    }
     eventsCache.push(...events);
     return events;
 }
