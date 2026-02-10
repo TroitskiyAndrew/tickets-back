@@ -192,7 +192,7 @@ const handleWebhook = async (req, res) => {
             const tickets = event.tickets.reduce((res, ticket) => {
               const count = state[ticket.type.toString()] || 0;
               if (count > 0) {
-                arr.push(...Array(count).fill({
+                res.push(...Array(count).fill({
                   userId,
                   event: event.id,
                   bookingId,
