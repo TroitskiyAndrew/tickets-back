@@ -251,8 +251,11 @@ const handleWebhook = async (req, res) => {
             break;
           }
           case 'WRONG': {
-            reply_markup.inline_keyboard = []
-            text = 'Ошибка в сумме: ' + text;
+            const tickets = await dataService.getDocuments('ticket', { bookingId: value });
+            await axios.post(`${config.tgApiUrl}/sendMessage`, {
+              chat_id: tickets[0].userId,
+              text: "Что-то не сошлось по сумме. Напишите сообщение, чтобы уточнить детали",
+            });
             break;
           }
           case 'DROP': {
@@ -261,6 +264,7 @@ const handleWebhook = async (req, res) => {
               chat_id: tickets[0].userId,
               text: "Менеджер не получил вашу оплату. Напишите сообщение, чтобы уточнить детали",
             });
+            reply_markup.inline_keyboard = []
             await dataService.deleteDocumentsByQuery('ticket', { bookingId: value });
             break;
           }
