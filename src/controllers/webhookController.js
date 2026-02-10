@@ -118,7 +118,7 @@ const handleWebhook = async (req, res) => {
             state[context] = state[context] - 1;
             let i = 0
             for (const row of reply_markup.inline_keyboard) {
-              if(row => row.length === 3){
+              if(row.length === 3){
                 i += 2;
                 const [action, value, ticketType] = row[0].callback_data.split('_');
                 row[1].text = state[ticketType] || 0
