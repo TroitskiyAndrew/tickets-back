@@ -2,6 +2,7 @@ const dataService = require("../services/mongodb");
 const citiesService = require("../services/citiesService");
 const eventsService = require("../services/eventsService");
 const membersService = require("../services/membersService");
+import crypto from 'crypto';
 const config = require("../config/config");
 const axios = require("axios");
 const { ObjectId } = require("mongodb");
@@ -146,7 +147,6 @@ const handleWebhook = async (req, res) => {
           }
           case 'VND': {
             const event = await eventsService.getEvent(value);
-            const state = stateMap.get(userId);
             const amount = Number(context);
             reply_markup.inline_keyboard = [
               [{ text: `Оплатил`, callback_data: `PAYED_${value}_VND` }],
@@ -159,11 +159,60 @@ const handleWebhook = async (req, res) => {
             const event = await eventsService.getEvent(value);
             const state = stateMap.get(userId);
             const amount = Number(context);
+            const bookingId = crypto.randomUUID();
+            const tickets = event.tickets.reduce((res, ticket) => {
+              const count = state[ticket.type.toString()];
+              if (count > 0) {
+                res.push({
+                  userId,
+                  event: event.id,
+                  bookingId,
+                  type: ticket.type,
+                  currency: 'RUB',
+                  method: 'bank',
+                  price: ticket.priceRub,
+                  cashier: config.cashier,
+                  confirmed: false,
+                })
+              }
+              return res;
+            }, []);
+            await dataService.createDocuments('ticket', tickets);
             reply_markup.inline_keyboard = [
               [{ text: `Оплатил`, callback_data: `PAYED_${value}_RUB` }],
               [{ text: `Назад`, callback_data: `EVENT_${value}` }],
             ]
             text = `Оплатите ${amount} руб. по по номеру 8-912-669-7190, пришлите скрин квитанции, нажмите "Оплатил"`;
+            break;
+          }
+          case 'PAYED': {
+            const event = await eventsService.getEvent(value);
+            const state = stateMap.get(userId);
+            const bookingId = crypto.randomUUID();
+            const tickets = event.tickets.reduce((res, ticket) => {
+              const count = state[ticket.type.toString()];
+              if (count > 0) {
+                res.push({
+                  userId,
+                  event: event.id,
+                  bookingId,
+                  type: ticket.type,
+                  currency: context,
+                  method: 'bank',
+                  price: context === 'VND' ? ticket.priceVND : ticket.priceRUB,
+                  cashier: config.cashier,
+                  confirmed: false,
+                })
+              }
+              return res;
+            }, []);
+            await dataService.createDocuments('ticket', tickets);
+            reply_markup.inline_keyboard = [
+              [
+                { text: "На главную", callback_data: "HOME" },
+              ]
+            ]
+            text = "Ожидайте подтверждения платежа"
             break;
           }
           case 'HOME': {
