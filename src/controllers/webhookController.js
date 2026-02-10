@@ -189,7 +189,7 @@ const handleWebhook = async (req, res) => {
             const event = await eventsService.getEvent(value);
             const state = stateMap.get(userId);
             console.log('state', state)
-            const bookingId = crypto.randomUUID();
+            const bookingId = crypto.randomBytes(10).toString('base64url');
             const tickets = event.tickets.reduce((res, ticket) => {
               const count = state[ticket.type.toString()];
               console.log('count', count)

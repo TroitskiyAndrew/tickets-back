@@ -55,7 +55,7 @@ const createDocuments = async (collectionName, docs) => {
     try {
         await connectClient();
         
-        const collection = getClient().db(config.mongodbDatabase).collection(collectionName);
+        const collection = client.db(config.mongodbDatabase).collection(collectionName);
         const res = await collection.insertMany(docs);
         // ToDo Получить айдишки созданных записей
         const insertedIds = [];
