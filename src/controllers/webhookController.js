@@ -1,13 +1,12 @@
 const dataService = require("../services/mongodb");
 const citiesService = require("../services/citiesService");
 const eventsService = require("../services/eventsService");
-const membersService = require("../services/membersService");
+const QRCode = require("qrcode");
 const crypto = require("crypto");
 const config = require("../config/config");
 const axios = require("axios");
 const { ObjectId } = require("mongodb");
 const { sendMessage } = require("../services/messageService");
-import QRCode from 'qrcode';
 
 const stateMap = new Map()
 
