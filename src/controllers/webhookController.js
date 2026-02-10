@@ -212,6 +212,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'CONFIRM': {
             const tickets = await dataService.getDocumentByQuery('ticket', {bookingId: value});
+            console.log(value, tickets)
             await dataService.updateDocuments("ticket", {bookingId: value}, { $set: { confirmed: true } });
             reply_markup.inline_keyboard = []
             text = 'Подтверждено: ' + text;
