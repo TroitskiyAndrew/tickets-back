@@ -14,12 +14,12 @@ const handleWebhook = async (req, res) => {
   try {
     const update = req.body;
     let isAdmin = false;
-    if (update._sendMessage) {
-      res.json({ ok: true });
-      console.log(req.body)
-      sendMessage(req.body.chat_id, req.body.text, req.body.reply_markup)
-      return;
-    }
+    // if (update._sendMessage) {
+    //   res.json({ ok: true });
+    //   console.log(req.body)
+    //   sendMessage(req.body.chat_id, req.body.text, req.body.reply_markup)
+    //   return;
+    // }
 
     if (update.callback_query) {
       let emptyButton = false;
@@ -159,25 +159,6 @@ const handleWebhook = async (req, res) => {
             const event = await eventsService.getEvent(value);
             const state = stateMap.get(userId);
             const amount = Number(context);
-            const bookingId = crypto.randomUUID();
-            const tickets = event.tickets.reduce((res, ticket) => {
-              const count = state[ticket.type.toString()];
-              if (count > 0) {
-                res.push({
-                  userId,
-                  event: event.id,
-                  bookingId,
-                  type: ticket.type,
-                  currency: 'RUB',
-                  method: 'bank',
-                  price: ticket.priceRub,
-                  cashier: config.cashier,
-                  confirmed: false,
-                })
-              }
-              return res;
-            }, []);
-            await dataService.createDocuments('ticket', tickets);
             reply_markup.inline_keyboard = [
               [{ text: `Оплатил`, callback_data: `PAYED_${value}_RUB` }],
               [{ text: `Назад`, callback_data: `EVENT_${value}` }],
@@ -207,12 +188,44 @@ const handleWebhook = async (req, res) => {
               return res;
             }, []);
             await dataService.createDocuments('ticket', tickets);
+            text = "Ожидайте подтверждения платежа"
             reply_markup.inline_keyboard = [
               [
                 { text: "На главную", callback_data: "HOME" },
               ]
             ]
-            text = "Ожидайте подтверждения платежа"
+            const userLink = `<a href="tg://user?id=${cq.from.id}">${cq.from.first_name || 'Пользователь'}</a>`;
+            await axios.post(`${config.tgApiUrl}/sendMessage`, {
+              chat_id: config.cashier,
+              text: `Оплата от ${userLink} на сумму ${tickets.reduce((acc, ticket) => acc += ticket.price)}${context === 'VND' ? '.000 VND' : ' руб'} за ${tickets.length} билетов`,
+              parse_mode: 'HTML',
+              reply_markup: {
+                inline_keyboard: [
+                  [{ text: "Подтвердить", callback_data: `CONFIRM_${bookingId}` }],
+                  [{ text: "Неправильная сумма", callback_data: `WRONG_${bookingId}` }],
+                  [{ text: "Деньги не поступили", callback_data: `DROP_${bookingId}` }],
+                ]
+              }
+            });
+           
+            break;
+          }
+          case 'CONFIRM': {
+            const tickets = await dataService.getDocumentByQuery('ticket', {bookingId: value});
+            await dataService.updateDocuments("ticket", {bookingId: value}, { $set: { confirmed: true } });
+            reply_markup.inline_keyboard = []
+            text = 'Подтверждено: ' + text;
+            break;
+          }
+          case 'WRONG': {
+            reply_markup.inline_keyboard = []
+            text = 'Ошибка в сумме: ' + text;
+            break;
+          }
+          case 'DROP': {
+            await dataService.deleteDocumentsByQuery('ticket', {bookingId: value});
+            reply_markup.inline_keyboard = []
+            text = 'Не пришел платеж: ' + text;
             break;
           }
           case 'HOME': {
