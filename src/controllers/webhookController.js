@@ -180,7 +180,7 @@ const handleWebhook = async (req, res) => {
                   type: ticket.type,
                   currency: context,
                   method: 'bank',
-                  price: context === 'VND' ? ticket.priceVND : ticket.priceRUB,
+                  price: context === 'VND' ? ticket.priceVND : ticket.priceRub,
                   cashier: config.cashier,
                   confirmed: false,
                 }))
@@ -197,7 +197,7 @@ const handleWebhook = async (req, res) => {
             const userLink = `<a href="tg://user?id=${cq.from.id}">${cq.from.first_name || 'Пользователь'}</a>`;
             await axios.post(`${config.tgApiUrl}/sendMessage`, {
               chat_id: config.cashier,
-              text: `Оплата от ${userLink} на сумму ${tickets.reduce((acc, ticket) => acc += ticket.price)}${context === 'VND' ? '.000 VND' : ' руб'} за ${tickets.length} билетов`,
+              text: `Оплата от ${userLink} на сумму ${tickets.reduce((acc, ticket) => acc += ticket.price, 0)}${context === 'VND' ? '.000 VND' : ' руб'} за ${tickets.length} билетов`,
               parse_mode: 'HTML',
               reply_markup: {
                 inline_keyboard: [
@@ -256,12 +256,24 @@ const handleWebhook = async (req, res) => {
           });
 
         } else {
-          await axios.post(`${config.tgApiUrl}/editMessageCaption`, {
-            chat_id,
-            message_id: cq.message.message_id,
-            caption: text,
-            reply_markup,
-          });
+          const msg = cq.message;
+          const hasPhoto = Array.isArray(msg.photo) && msg.photo.length > 0;
+          if(hasPhoto){
+            await axios.post(`${config.tgApiUrl}/editMessageCaption`, {
+              chat_id,
+              message_id: cq.message.message_id,
+              caption: text,
+              reply_markup,
+            });
+
+          } else {
+            await axios.post(`${config.tgApiUrl}/editMessageText`, {
+              chat_id,
+              message_id: cq.message.message_id,
+              text,
+              reply_markup,
+            });
+          }
         }
       }
 
