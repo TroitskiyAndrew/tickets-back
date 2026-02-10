@@ -45,7 +45,7 @@ const handleWebhook = async (req, res) => {
           case 'CITY': {
             const events = await eventsService.getEventsByCity(value);
             reply_markup.inline_keyboard = events.map(event => [
-              { text: `${event.type}, ${event.date}`, callback_data: `EVENT_${event.id}_${value}` },
+              { text: `${event.type}, ${event.date}`, callback_data: `EVENT_${event.id}` },
             ])
             reply_markup.inline_keyboard.push([
               { text: "Назад", callback_data: 'getCities' },
@@ -72,7 +72,7 @@ const handleWebhook = async (req, res) => {
             }, [])
 
             reply_markup.inline_keyboard.push([
-              { text: "Назад", callback_data: `CITY_${context}` },
+              { text: "Назад", callback_data: `CITY_${event.city}` },
             ])
             text = "Текст про список билетов"
             break;
@@ -156,7 +156,7 @@ const handleWebhook = async (req, res) => {
               reply_markup: {
                 inline_keyboard: [
                   [{ text: `Оплатил`, callback_data: `PAYED_${value}_VND` }],
-                  [{ text: `Назад`, callback_data: `EVENT_${value}_${event.city}` }],
+                  [{ text: `Назад`, callback_data: `EVENT_${value}` }],
                 ]
               },
             });
@@ -164,7 +164,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'RUB': {
             const event = await eventsService.getEvent(value);
-            const state = stateStr ? stateStr.split(',').map(Number) : event.tickets.map(() => 0);
+            const state = stateMap.get(userId);
             const amount = Number(context);
             emptyButton = true;
             await axios.post(`${config.tgApiUrl}/sendPhoto`, {
@@ -174,7 +174,7 @@ const handleWebhook = async (req, res) => {
               reply_markup: {
                 inline_keyboard: [
                   [{ text: `Оплатил`, callback_data: `PAYED_${value}_RUB` }],
-                  [{ text: `Назад`, callback_data: `EVENT_${value}_${event.city}` }],
+                  [{ text: `Назад`, callback_data: `EVENT_${value}` }],
                 ]
               },
             });
