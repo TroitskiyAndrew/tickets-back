@@ -64,7 +64,7 @@ const handleWebhook = async (req, res) => {
               event: value,
             }
             stateMap.set(userId, state);
-            reply_markup.inline_keyboard = event.tickets.filter(ticket => isAdmin || ticket.priceVND > 0).reduce((rows, ticket) => {
+            reply_markup.inline_keyboard = event.tickets.filter(ticket => isAdmin || ticket.priceVND > 0).sort((a,b) => b.priceVND - a.priceVND).reduce((rows, ticket) => {
               rows.push([
                 { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет'}, ${ticket.priceVND}.000 VND/${ticket.priceRub} руб`, callback_data: `TICKET_${ticket.type}` }
               ])
