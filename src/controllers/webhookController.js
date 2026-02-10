@@ -146,7 +146,7 @@ const handleWebhook = async (req, res) => {
               res[1] += (state[ticket.type.toString()] ?? 0) * ticket.priceRub;
               return res;
             }, [0, 0]);
-            reply_markup.inline_keyboard.length = event.tickets.length * 2;
+            reply_markup.inline_keyboard.length = i;
             if (totalVND > 0) {
               reply_markup.inline_keyboard.push([
                 { text: `Купить за ${totalVND}.000 VND`, callback_data: `VND_${value}_${totalVND}` },
