@@ -257,6 +257,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'DROP': {
             const tickets = await dataService.getDocuments('ticket', { bookingId: value });
+            console.log('drop', tickets)
             await axios.post(`${config.tgApiUrl}/sendMessage`, {
               chat_id: tickets[0].userId,
               test: "Менеджер не получил вашу оплату. Напишите сообщение, чтобы уточнить детали",
