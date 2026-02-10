@@ -90,6 +90,7 @@ const handleWebhook = async (req, res) => {
               }
             }
             const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
+            console.log('INCR', event.tickets, state)
             const [totalVND, totalRub] = event.tickets.reduce((res, ticket) => {
               res[0] += state[ticket.type.toString()] * ticket.priceVND;
               res[1] += state[ticket.type.toString()] * ticket.priceRub;
@@ -125,6 +126,7 @@ const handleWebhook = async (req, res) => {
               }
             }
             const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
+            console.log('DECR', event.tickets, state)
             const [totalVND, totalRub] = event.tickets.reduce((res, ticket) => {
               res[0] += state[ticket.type.toString()] * ticket.priceVND;
               res[1] += state[ticket.type.toString()] * ticket.priceRub;
