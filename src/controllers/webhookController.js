@@ -29,7 +29,7 @@ const handleWebhook = async (req, res) => {
       const reply_markup = cq.message.reply_markup;
       const userId = cq.from.id.toString()
       isAdmin = config.admins.includes(userId)
-      let text = cq.message.caption + "\u200B";
+      let text = cq.message.caption + "\u200B" || cq.message.text + "\u200B";
       let newPhoto;
       if (data === 'getCities') {
         const cities = await citiesService.getCities();
