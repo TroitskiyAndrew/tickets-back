@@ -84,7 +84,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'INCR': {
             const event = await eventsService.getEvent(value);
-            const state = stateMap.get(userId);
+            const state = stateMap.get(userId) || {};
             const bookedTickets = await dataService.getDocuments('ticket', { event: event.id, type: context, confirmed: true });
             const availableTickets = event.tickets.find(ticket => ticket.type === Number(context)).count - bookedTickets.length;
             const currentCount = state[context] || 0;
@@ -122,7 +122,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'DECR': {
             const event = await eventsService.getEvent(value);
-            const state = stateMap.get(userId);
+            const state = stateMap.get(userId) || {};
             if (!state[context]) {
               emptyButton = true;
               break;
@@ -172,7 +172,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'RUB': {
             const event = await eventsService.getEvent(value);
-            const state = stateMap.get(userId);
+            const state = stateMap.get(userId) || {};
             const amount = Number(context);
             reply_markup.inline_keyboard = [
               [{ text: `Оплатил`, callback_data: `PAYED_${value}_RUB` }],
@@ -184,7 +184,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'PAYED': {
             const event = await eventsService.getEvent(value);
-            const state = stateMap.get(userId);
+            const state = stateMap.get(userId) || {};
             const bookingId = crypto.randomBytes(10).toString('base64url');
             const tickets = event.tickets.reduce((res, ticket) => {
               const count = state[ticket.type.toString()] || 0;
