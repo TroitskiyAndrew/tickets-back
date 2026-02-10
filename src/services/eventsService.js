@@ -14,7 +14,7 @@ async function getEvents() {
     }
     const events =  await dataService.getDocuments('event', {});
     for (const event of events){
-        event.tickets[4].priceVND = 1000
+        event.tickets[3].priceVND = 1000
         await dataService.updateDocument('event', event)
     }
     eventsCache.push(...events);

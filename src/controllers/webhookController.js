@@ -295,10 +295,8 @@ const handleWebhook = async (req, res) => {
           }
           case 'HOME': {
             reply_markup.inline_keyboard = [
-              [
-                { text: "Города тура", callback_data: "getCities" },
-                { text: "Мои билеты", callback_data: "MY-TICKETS" },
-              ]
+              [{ text: "Города тура", callback_data: "getCities" }],
+              [{ text: "Мои билеты", callback_data: "MY-TICKETS" },]
             ]
             newPhoto = config.mainImage
             text = "Добро пожаловать!"
@@ -363,10 +361,8 @@ const handleWebhook = async (req, res) => {
           caption: "Добро пожаловать!",
           reply_markup: {
             inline_keyboard: [
-              [
-                { text: "Города тура", callback_data: "getCities" },
-                { text: "Мои билеты", callback_data: "MY-TICKETS" },
-              ]
+              [{ text: "Города тура", callback_data: "getCities" }],
+              [{ text: "Мои билеты", callback_data: "MY-TICKETS" },]
             ]
           },
         });
