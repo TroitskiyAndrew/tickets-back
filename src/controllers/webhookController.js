@@ -28,7 +28,7 @@ const handleWebhook = async (req, res) => {
       const reply_markup = cq.message.reply_markup;
       const userId = cq.from.id.toString()
       isAdmin = config.admins.includes(userId)
-      let text = cq.message.text + "\u200B";
+      let text = cq.message.caption + "\u200B";
       let newPhoto;
       if (data === 'getCities') {
         const cities = await citiesService.getCities();
@@ -91,8 +91,8 @@ const handleWebhook = async (req, res) => {
             }
             const backButton = reply_markup.inline_keyboard[reply_markup.inline_keyboard.length - 1];
             const [totalVND, totalRub] = event.tickets.reduce((res, ticket) => {
-              res[0] += state[ticket.type] * ticket.priceVND;
-              res[1] += state[ticket.type] * ticket.priceRub;
+              res[0] += state[ticket.type.toString()] * ticket.priceVND;
+              res[1] += state[ticket.type.toString()] * ticket.priceRub;
               return res;
             }, [0, 0]);
             reply_markup.inline_keyboard.length = i;
