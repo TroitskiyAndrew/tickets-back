@@ -105,7 +105,6 @@ const handleWebhook = async (req, res) => {
             const [totalVND, totalRub] = event.tickets.reduce((res, ticket) => {
               res[0] += (state[ticket.type.toString()] ?? 0) * ticket.priceVND;
               res[1] += (state[ticket.type.toString()] ?? 0) * ticket.priceRub;
-              console.log('res', res)
               return res;
             }, [0, 0]);
             reply_markup.inline_keyboard.length = i;
@@ -267,6 +266,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'MY-TICKETS': {
             const tickets = await dataService.getDocuments('ticket', { userId });
+            emptyButton = true;
             text = 'Подтверждено: ' + text;
             for (const ticket of tickets) {
               const event = await eventsService.getEvent(ticket.event);
