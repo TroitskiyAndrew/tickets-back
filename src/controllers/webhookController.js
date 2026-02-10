@@ -228,8 +228,8 @@ const handleWebhook = async (req, res) => {
             reply_markup.inline_keyboard = []
             text = 'Подтверждено: ' + text;
             for (const ticket of tickets) {
-              const event = await eventsService.getEvent(value);
-              const link = `${ticketUrlBase}${ticket.id}`;
+              const event = await eventsService.getEvent(ticket.event);
+              const link = `${config.ticketUrlBase}${ticket.id}`;
               const qrDataUrl = await QRCode.toDataURL(link, {
                 type: 'image/png',
                 width: 512,
