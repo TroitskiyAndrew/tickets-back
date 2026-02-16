@@ -11,6 +11,7 @@ const roomsController = require("./controllers/roomsController");
 const sharesController = require("./controllers/sharesController");
 const webhookController = require("./controllers/webhookController");
 const socketService = require("./services/socketService");
+const cityController = require("./controllers/cityController");
 
 const MAX_AGE_SECONDS = 24 * 60 * 60; // 24 часа
 
@@ -69,7 +70,7 @@ app.post("/webhook", webhookController.handleWebhook);
 
 
 
-// app.get("/auth", usersController.auth);
+app.get("/cities", cityController.getCities);
 // app.get("/users/:userId", usersController.getUser);
 // app.post("/users", usersController.createUser);
 // app.put("/users", usersController.updateUser);
