@@ -1,13 +1,16 @@
 const express = require("express");
+const multer = require("multer");
 const http = require("http");
 const cors = require("cors");
 const  { parse, isValid } = require("@telegram-apps/init-data-node");
+
+const upload = multer({ dest: 'uploads/' });
 
 const config = require("./config/config");
 const usersController = require("./controllers/usersController");
 const membersController = require("./controllers/membersController");
 const paymentsController = require("./controllers/paymentsController");
-const roomsController = require("./controllers/roomsController");
+const ticketsController = require("./controllers/ticketsController");
 const placeController = require("./controllers/placeController");
 const webhookController = require("./controllers/webhookController");
 const socketService = require("./services/socketService");
@@ -20,58 +23,59 @@ const server = http.createServer(app);
 
 socketService.initSocket(server)
 
-// const telegramInitDataMiddleware = (req, res, next) => {
-//   try {
+const telegramInitDataMiddleware = (req, res, next) => {
+  try {
 
-//     if (!config.prod) {
-//       // ToDo для локального тестирования
-//       req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
-//       // req.telegramData.params = {
-//       //   roomId: '68ca60d0d9b5a5738bcde91e',
-//       //   paymentId: '68ca893b62761dbcf40a4e64'
-//       // }
-//       next();
-//       return;
-//     }
+    // ToDo для локального тестирования
+      req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
+      next();
+      return;
 
-//     // 1) Получаем СЫРУЮ строку initData (как есть, без перекодирования!)
-//     const raw = (req.get(config.telegrammHeader) || req.body?.initData || '').toString();
-//     if (!raw) {
-//       return res.status(401).json({ error: 'initData missing' });
-//     }
-//     const isInitDataValid = isValid(
-//       raw,
-//       config.botToken,
-//     );
-//     if(!isInitDataValid){
-//       return res.status(401).json({ error: 'initData invalid' });
-//     }
-//     const telegramData = parse(raw);
-//     telegramData.params = (telegramData.start_param || '').split(config.splitParams).reduce((result, param) => {
-//       const [key, value] = param.split('=');
-//       result[key] = value;
-//       return result;
-//     } , {}) 
-//     req.telegramData = telegramData;
-//     next();
+    // if (!config.prod) {
+    //   // ToDo для локального тестирования
+    //   req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
+    //   next();
+    //   return;
+    // }
 
+    // // 1) Получаем СЫРУЮ строку initData (как есть, без перекодирования!)
+    // const raw = (req.get(config.telegrammHeader) || req.body?.initData || '').toString();
+    // if (!raw) {
+    //   return res.status(401).json({ error: 'initData missing' });
+    // }
+    // const isInitDataValid = isValid(
+    //   raw,
+    //   config.botToken,
+    // );
+    // if(!isInitDataValid){
+    //   return res.status(401).json({ error: 'initData invalid' });
+    // }
+    // const telegramData = parse(raw);
+    // telegramData.params = (telegramData.start_param || '').split(config.splitParams).reduce((result, param) => {
+    //   const [key, value] = param.split('=');
+    //   result[key] = value;
+    //   return result;
+    // } , {}) 
+    // req.telegramData = telegramData;
+    // next();
 
-//   } catch (e) {
-//     console.log(e)
-//     return res.status(400).json({ error: 'initData processing error', details: e?.message });
-//   }
-// };
+  } catch (e) {
+    console.log(e)
+    return res.status(400).json({ error: 'initData processing error', details: e?.message });
+  }
+};
 
 
 app.use(express.json());
 app.use(cors({ origin: config.frontURL, credentials: true }));
 app.post("/webhook", webhookController.handleWebhook);
-// app.use(telegramInitDataMiddleware);
+app.use(telegramInitDataMiddleware);
 
 
 
 app.get("/cities", cityController.getCities);
 app.get("/places", placeController.getPlaces);
+app.post("/tickets", upload.single('image'), ticketsController.buyTickets);
 // app.get("/users/:userId", usersController.getUser);
 // app.post("/users", usersController.createUser);
 // app.put("/users", usersController.updateUser);
