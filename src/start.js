@@ -8,7 +8,7 @@ const usersController = require("./controllers/usersController");
 const membersController = require("./controllers/membersController");
 const paymentsController = require("./controllers/paymentsController");
 const roomsController = require("./controllers/roomsController");
-const sharesController = require("./controllers/sharesController");
+const placeController = require("./controllers/placeController");
 const webhookController = require("./controllers/webhookController");
 const socketService = require("./services/socketService");
 const cityController = require("./controllers/cityController");
@@ -71,6 +71,7 @@ app.post("/webhook", webhookController.handleWebhook);
 
 
 app.get("/cities", cityController.getCities);
+app.get("/places", placeController.getPlaces);
 // app.get("/users/:userId", usersController.getUser);
 // app.post("/users", usersController.createUser);
 // app.put("/users", usersController.updateUser);
