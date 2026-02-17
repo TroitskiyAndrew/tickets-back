@@ -26,38 +26,39 @@ socketService.initSocket(server)
 const telegramInitDataMiddleware = (req, res, next) => {
   try {
 
-    // ToDo для локального тестирования
-      req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
-      next();
-      return;
-
-    // if (!config.prod) {
-    //   // ToDo для локального тестирования
+    // // ToDo для локального тестирования
     //   req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
     //   next();
     //   return;
-    // }
 
-    // // 1) Получаем СЫРУЮ строку initData (как есть, без перекодирования!)
-    // const raw = (req.get(config.telegrammHeader) || req.body?.initData || '').toString();
-    // if (!raw) {
-    //   return res.status(401).json({ error: 'initData missing' });
-    // }
-    // const isInitDataValid = isValid(
-    //   raw,
-    //   config.botToken,
-    // );
-    // if(!isInitDataValid){
-    //   return res.status(401).json({ error: 'initData invalid' });
-    // }
-    // const telegramData = parse(raw);
-    // telegramData.params = (telegramData.start_param || '').split(config.splitParams).reduce((result, param) => {
-    //   const [key, value] = param.split('=');
-    //   result[key] = value;
-    //   return result;
-    // } , {}) 
-    // req.telegramData = telegramData;
-    // next();
+    if (!config.prod) {
+      // ToDo для локального тестирования
+      req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
+      next();
+      return;
+    }
+
+    // 1) Получаем СЫРУЮ строку initData (как есть, без перекодирования!)
+    const raw = (req.get(config.telegrammHeader) || req.body?.initData || '').toString();
+    if (!raw) {
+      return res.status(401).json({ error: 'initData missing' });
+    }
+    const isInitDataValid = isValid(
+      raw,
+      config.botToken,
+    );
+    if(!isInitDataValid){
+      return res.status(401).json({ error: 'initData invalid' });
+    }
+    const telegramData = parse(raw);
+    telegramData.params = (telegramData.start_param || '').split(config.splitParams).reduce((result, param) => {
+      const [key, value] = param.split('=');
+      result[key] = value;
+      return result;
+    } , {}) 
+    req.telegramData = telegramData;
+    console.log('telegramData_ ', telegramData);
+    next();
 
   } catch (e) {
     console.log(e)
