@@ -243,7 +243,7 @@ const handleWebhook = async (req, res) => {
               const form = new FormData();
               form.append('chat_id', ticket.userId);
               form.append('photo', qrBuffer, { filename: 'qr.png' });
-              form.append('caption', `Ваш билет на ${event.type} ${event.date}`);
+              form.append('caption', `Ваш билет на ${config.eventTypes[event.type]} ${event.date} ${event.start} подтвержден`);
 
               await axios.post(`${config.tgApiUrl}/sendPhoto`, form);
             }

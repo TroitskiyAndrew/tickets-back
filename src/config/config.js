@@ -19,5 +19,6 @@ module.exports = {
     rubQR: process.env.RUB_QR || 'https://www.dropbox.com/scl/fi/h9q90ybkyi8te4a4dj6a4/rubQR.jpg?rlkey=hb1kax5319wa2qkdznprxwqbx&dl=0',
     rubAccount: process.env.RUB_ACCOUNT || 'по номеру 89126697190 на АльфаБанк',
     mainImage: process.env.MAIN_IMAGE || 'https://www.dropbox.com/scl/fi/effyav2xjnlc8rvdg5x56/main.jpeg?rlkey=073r242acvcathoutqiqipwyu&dl=0',
-    wait: process.env.WAIT || 'https://www.dropbox.com/scl/fi/gll6m7uuzwi37cb6379bl/zhdun.jpg?rlkey=xmm48wmk0ri4ckudm5bde23ez&dl=0'
+    wait: process.env.WAIT || 'https://www.dropbox.com/scl/fi/gll6m7uuzwi37cb6379bl/zhdun.jpg?rlkey=xmm48wmk0ri4ckudm5bde23ez&dl=0',
+    eventTypes: process.env.EVENT_TYPES ? JSON.parse(process.env.EVENT_TYPES) : ['Стендап Концерт', 'Стендап Нетворкинг'],
 }
