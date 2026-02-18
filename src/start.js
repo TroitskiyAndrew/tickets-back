@@ -41,7 +41,8 @@ const telegramInitDataMiddleware = (req, res, next) => {
     // 1) Получаем СЫРУЮ строку initData (как есть, без перекодирования!)
     const raw = (req.get(config.telegrammHeader) || req.body?.initData || '').toString();
     if (!raw) {
-      return res.status(401).json({ error: 'initData missing' });
+      req.telegramData = {}
+      next();
     }
     const isInitDataValid = isValid(
       raw,

@@ -10,6 +10,9 @@ const buyTickets = async (req, res) => {
     const { eventId, currency, tickets: ticketsString } = req.body;
     const file = req.file;
     const { user } = req.telegramData;
+    if(!user){
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     const bookingId = crypto.randomBytes(10).toString('base64url');
     const tickets = JSON.parse(ticketsString);
     const newTickets = tickets.map(ticket => ({
