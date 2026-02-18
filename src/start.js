@@ -71,12 +71,12 @@ const telegramInitDataMiddleware = (req, res, next) => {
 app.use(express.json());
 app.use(cors({ origin: config.frontURL, credentials: true }));
 app.post("/webhook", webhookController.handleWebhook);
-app.use(telegramInitDataMiddleware);
 
 
 
 app.get("/cities", cityController.getCities);
 app.get("/places", placeController.getPlaces);
+app.use(telegramInitDataMiddleware);
 app.post("/tickets", upload.single('image'), ticketsController.buyTickets);
 // app.get("/users/:userId", usersController.getUser);
 // app.post("/users", usersController.createUser);
