@@ -57,7 +57,6 @@ const telegramInitDataMiddleware = (req, res, next) => {
         return result;
       } , {}) 
       req.telegramData = telegramData;
-      console.log('telegramData_ ', telegramData);
       next();
     }
 
@@ -76,9 +75,11 @@ app.post("/webhook", webhookController.handleWebhook);
 
 app.get("/cities", cityController.getCities);
 app.get("/places", placeController.getPlaces);
+app.get("/qr/:ticketId", ticketsController.getQR);
 app.use(telegramInitDataMiddleware);
 app.post("/tickets", upload.single('image'), ticketsController.buyTickets);
 app.get("/tickets", ticketsController.getTickets);
+app.get("/ticket/:ticketId", ticketsController.getTicket);
 // app.get("/users/:userId", usersController.getUser);
 // app.post("/users", usersController.createUser);
 // app.put("/users", usersController.updateUser);
