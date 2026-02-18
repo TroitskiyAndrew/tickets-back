@@ -6,9 +6,9 @@ const config = require("../config/config");
 const axios = require("axios");
 
 const buyTickets = async (req, res) => {
+  console.log('buyTickets_ req.body ', req.body);
   try {
     const { eventId, currency, tickets: ticketsString } = req.body;
-    const file = req.file;
     const { user } = req.telegramData;
     if(!user){
        res.status(401).json({ error: 'Unauthorized' });

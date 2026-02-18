@@ -30,7 +30,7 @@ const telegramInitDataMiddleware = (req, res, next) => {
     //   req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
     //   next();
     //   return;
-
+    console.log('telegramInitDataMiddleware_ req.headers ', req.headers);
     if (!config.prod) {
       // ToDo для локального тестирования
       req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
@@ -42,6 +42,7 @@ const telegramInitDataMiddleware = (req, res, next) => {
     const raw = (req.get(config.telegrammHeader) || req.body?.initData || '').toString();
     if (!raw) {
       req.telegramData = {}
+      console.log('telegramInitDataMiddleware_ no initData');
       next();
     } else{
       const isInitDataValid = isValid(
