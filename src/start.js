@@ -43,23 +43,24 @@ const telegramInitDataMiddleware = (req, res, next) => {
     if (!raw) {
       req.telegramData = {}
       next();
+    } else{
+      const isInitDataValid = isValid(
+        raw,
+        config.botToken,
+      );
+      if(!isInitDataValid){
+        return res.status(401).json({ error: 'initData invalid' });
+      }
+      const telegramData = parse(raw);
+      telegramData.params = (telegramData.start_param || '').split(config.splitParams).reduce((result, param) => {
+        const [key, value] = param.split('=');
+        result[key] = value;
+        return result;
+      } , {}) 
+      req.telegramData = telegramData;
+      console.log('telegramData_ ', telegramData);
+      next();
     }
-    const isInitDataValid = isValid(
-      raw,
-      config.botToken,
-    );
-    if(!isInitDataValid){
-      return res.status(401).json({ error: 'initData invalid' });
-    }
-    const telegramData = parse(raw);
-    telegramData.params = (telegramData.start_param || '').split(config.splitParams).reduce((result, param) => {
-      const [key, value] = param.split('=');
-      result[key] = value;
-      return result;
-    } , {}) 
-    req.telegramData = telegramData;
-    console.log('telegramData_ ', telegramData);
-    next();
 
   } catch (e) {
     console.log(e)
