@@ -17,8 +17,9 @@ async function getCities() {
         return map
     }, new Map());
     cities.forEach(city => city.events = eventsMap.get(city.id));
-    citiesCache.push(...cities)
-    return cities;
+    const sortedCities = cities.sort((a, b) => a.order - b.order);
+    citiesCache.push(...sortedCities)
+    return sortedCities;
 }
 
 
