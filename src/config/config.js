@@ -14,7 +14,7 @@ module.exports = {
     admins: process.env.ADMINS ? process.env.ADMINS.split(',') : [],
     ticketTypes: process.env.TICKET_TYPES ? JSON.parse(process.env.TICKET_TYPES) : {},
     cashier: process.env.CASHIER ? Number(process.env.CASHIER) : 480144364,
-    ticketUrlBase: (process.env.TICKET_URL_BASE || 'https://example.com/ticket') + '/',
+    ticketUrlBase: (process.env.TICKET_URL_BASE || 'https://t.me/sverlov_vietnam_2026_bot') + '?startapp=TICKET_SPLIT_',
     vndQR: process.env.VND_QR || 'https://www.dropbox.com/scl/fi/5mnlymj9q1sbl69ydyqth/vndQR.jpg?rlkey=lo095u7dl181eq7lxgah6x868&dl=0',
     rubQR: process.env.RUB_QR || 'https://www.dropbox.com/scl/fi/h9q90ybkyi8te4a4dj6a4/rubQR.jpg?rlkey=hb1kax5319wa2qkdznprxwqbx&dl=0',
     rubAccount: process.env.RUB_ACCOUNT || 'по номеру 89126697190 на АльфаБанк',

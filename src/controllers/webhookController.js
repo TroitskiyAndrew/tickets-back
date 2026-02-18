@@ -361,17 +361,7 @@ const handleWebhook = async (req, res) => {
     const message = update.message;
     if (message) {
       if (message.text === "/start") {
-        await axios.post(`${config.tgApiUrl}/sendPhoto`, {
-          chat_id: message.chat.id,
-          photo: config.mainImage,
-          caption: "Добро пожаловать!",
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: "Города тура", callback_data: "getCities" }],
-              [{ text: "Мои билеты", callback_data: "MY-TICKETS" },]
-            ]
-          },
-        });
+        return;
       } else {
         await axios.post(`${config.tgApiUrl}/forwardMessage`, {
           chat_id: config.cashier,
