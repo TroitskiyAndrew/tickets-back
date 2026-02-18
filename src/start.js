@@ -78,6 +78,7 @@ app.get("/cities", cityController.getCities);
 app.get("/places", placeController.getPlaces);
 app.use(telegramInitDataMiddleware);
 app.post("/tickets", upload.single('image'), ticketsController.buyTickets);
+app.get("/tickets", ticketsController.getTickets);
 // app.get("/users/:userId", usersController.getUser);
 // app.post("/users", usersController.createUser);
 // app.put("/users", usersController.updateUser);

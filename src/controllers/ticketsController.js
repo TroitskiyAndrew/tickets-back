@@ -53,8 +53,24 @@ const buyTickets = async (req, res) => {
   }
 };
 
-
+const getTickets = async (req, res) => {
+  try {
+    const { user } = req.telegramData;
+    if(!user){
+       res.status(401).json({ error: 'Unauthorized' });
+       return;
+    }
+    const tickets = await dataService.getDocuments('ticket', { userId: user.id });
+    res.status(200).send(tickets);
+    return;
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error);
+    return;
+  }
+};
 
 module.exports = {
   buyTickets: buyTickets,
+  getTickets: getTickets,
 };
