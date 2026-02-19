@@ -82,7 +82,7 @@ app.use(telegramInitDataMiddleware);
 app.post("/tickets", upload.single('image'), ticketsController.buyTickets);
 app.get("/tickets", ticketsController.getTickets);
 app.get("/ticket/:ticketId", ticketsController.getTicket);
-app.post("/cities", ticketsController.saveVisit);
+app.post("/cities", cityController.saveVisitToCity);
 // app.get("/users/:userId", usersController.getUser);
 // app.post("/users", usersController.createUser);
 // app.put("/users", usersController.updateUser);
