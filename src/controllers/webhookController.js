@@ -64,7 +64,7 @@ const handleWebhook = async (req, res) => {
               event: value,
             }
             stateMap.set(userId, state);
-            reply_markup.inline_keyboard = event.tickets.filter(ticket => isAdmin || ticket.priceVND > 0).sort((a,b) => b.priceVND - a.priceVND).reduce((rows, ticket) => {
+            reply_markup.inline_keyboard = event.tickets.filter(ticket => isAdmin || ticket.priceVND > 0).sort((a, b) => b.priceVND - a.priceVND).reduce((rows, ticket) => {
               rows.push([
                 { text: `${config.ticketTypes[ticket.type.toString()] || 'Какой-то билет'}, ${ticket.priceVND}.000 VND/${ticket.priceRub} руб`, callback_data: `TICKET_${ticket.type}` }
               ])
@@ -270,7 +270,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'MY-TICKETS': {
             const tickets = await dataService.getDocuments('ticket', { userId: Number(userId) });
-            if(tickets.length === 0){
+            if (tickets.length === 0) {
               responseText = 'У вас еще нет билетов'
             }
             emptyButton = true;
@@ -361,22 +361,24 @@ const handleWebhook = async (req, res) => {
     const message = update.message;
     if (message) {
       if (message.text === "/start") {
+        const now = Date.now();
+        console.log('start', now)
         try {
           await axios.post(`${config.tgApiUrl}/sendPhoto`, {
-        chat_id: message.chat.id,
-        photo: config.bot,
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: "Открыть приложение", web_app: { url: 'https://sverlov-vietnam-2026.com' } },
-            ]
-          ]
-        },
-      }, {timeout: 5000});
+            chat_id: message.chat.id,
+            photo: config.bot,
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  { text: "Открыть приложение", web_app: { url: 'https://sverlov-vietnam-2026.com' } },
+                ]
+              ]
+            },
+          }, { timeout: 5000 });
         } catch (error) {
           console.log('Error sending welcome message:', error);
         }
-        
+        console.log('end', Date.now() - now)
         return;
       } else {
         await axios.post(`${config.tgApiUrl}/forwardMessage`, {
