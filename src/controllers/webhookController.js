@@ -363,7 +363,7 @@ const handleWebhook = async (req, res) => {
       if (message.text === "/start") {
         await axios.post(`${config.tgApiUrl}/sendPhoto`, {
         chat_id: message.chat.id,
-        photo: config.mainImage,
+        photo: config.bot,
         reply_markup: {
           inline_keyboard: [
             [
