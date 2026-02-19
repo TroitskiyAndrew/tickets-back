@@ -12,7 +12,7 @@ const placesMap = new Map();
 
 const buyTickets = async (req, res) => {
   try {
-    const { eventId, currency, tickets: ticketsString } = req.body;
+    const {  currency, tickets: ticketsString } = req.body;
     const { user } = req.telegramData;
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -22,7 +22,7 @@ const buyTickets = async (req, res) => {
     const tickets = JSON.parse(ticketsString);
     const newTickets = tickets.map(ticket => ({
       userId: user.id,
-      event: eventId,
+      event: ticket.eventId,
       bookingId,
       type: ticket.type,
       currency,
