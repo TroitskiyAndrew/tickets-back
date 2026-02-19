@@ -30,6 +30,7 @@ const buyTickets = async (req, res) => {
       price: ticket.price,
       cashier: config.cashier,
       confirmed: false,
+      add: ticket.add,
     }));
     await dataService.createDocuments('ticket', newTickets);
     const form = new FormData();
