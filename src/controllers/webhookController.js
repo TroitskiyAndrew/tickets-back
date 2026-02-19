@@ -361,9 +361,9 @@ const handleWebhook = async (req, res) => {
     const message = update.message;
     if (message) {
       if (message.text === "/start") {
-        await axios.post(`${config.tgApiUrl}/sendPhoto`, {
+        await axios.post(`${config.tgApiUrl}/sendMessage`, {
         chat_id: message.chat.id,
-        photo: config.bot,
+        text: "Откройте приложение, чтобы начать",
         reply_markup: {
           inline_keyboard: [
             [
