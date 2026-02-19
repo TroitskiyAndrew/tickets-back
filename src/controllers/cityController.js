@@ -13,8 +13,23 @@ const getCities = async (req, res) => {
   }
 };
 
+const saveVisitToCity = async (req, res) => {
+  try {
+    const {city} = req.body;
+    const { user } = req.telegramData;
+    await cityService.saveVisit(user.id, city)
+    res.status(200).send(true);
+    return;
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error);
+    return;
+  }
+};
+
 
 
 module.exports = {
   getCities: getCities,
+  saveVisitToCity: saveVisitToCity,
 };

@@ -14,6 +14,7 @@ const ticketsController = require("./controllers/ticketsController");
 const placeController = require("./controllers/placeController");
 const webhookController = require("./controllers/webhookController");
 const socketService = require("./services/socketService");
+const citiesService = require("./services/citiesService");
 const cityController = require("./controllers/cityController");
 
 const MAX_AGE_SECONDS = 24 * 60 * 60; // 24 часа
@@ -57,6 +58,7 @@ const telegramInitDataMiddleware = (req, res, next) => {
         return result;
       } , {}) 
       req.telegramData = telegramData;
+      citiesService.saveVisit(telegramData.user.id)
       next();
     }
 
@@ -80,6 +82,7 @@ app.use(telegramInitDataMiddleware);
 app.post("/tickets", upload.single('image'), ticketsController.buyTickets);
 app.get("/tickets", ticketsController.getTickets);
 app.get("/ticket/:ticketId", ticketsController.getTicket);
+app.post("/cities", ticketsController.saveVisit);
 // app.get("/users/:userId", usersController.getUser);
 // app.post("/users", usersController.createUser);
 // app.put("/users", usersController.updateUser);
