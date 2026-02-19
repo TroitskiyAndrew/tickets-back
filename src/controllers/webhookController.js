@@ -361,6 +361,20 @@ const handleWebhook = async (req, res) => {
     const message = update.message;
     if (message) {
       if (message.text === "/start") {
+        await axios.post(`${config.tgApiUrl}/sendMessage`, {
+        chat_id: message.chat.id,
+        text: "Добро пожаловать!",
+        reply_markup: {
+          inline_keyboard: [
+            [
+          {
+            text: '🚀 Открыть приложение',
+            web_app: { url: 'https://sverlov-vietnam-2026.com' }
+          }
+        ]
+          ]
+        },
+      });
         return;
       } else {
         await axios.post(`${config.tgApiUrl}/forwardMessage`, {
