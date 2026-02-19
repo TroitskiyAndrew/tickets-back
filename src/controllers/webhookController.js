@@ -235,7 +235,7 @@ const handleWebhook = async (req, res) => {
             text = 'Подтверждено: ' + text;
             await axios.post(`${config.tgApiUrl}/sendMessage`, {
               chat_id: tickets[0].userId,
-              text: "Йоу-йоу! Мы получили твои деньги, все четко. Билеты сейчас упад в чат, плюс ты всегда сможешь найти их в приложении бота. Увидимся на шоу!",
+              text: "Йоу-йоу! Мы получили ваши деньги, все четко. Билеты сейчас упад в чат, плюс ты всегда сможешь найти их в приложении бота. Увидимся на шоу!",
             });
             for (const ticket of tickets) {
               const event = await eventsService.getEvent(ticket.event);
