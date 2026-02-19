@@ -14,6 +14,7 @@ const stateMap = new Map()
 const handleWebhook = async (req, res) => {
   try {
     const update = req.body;
+    res.sendStatus(200);
     let isAdmin = false;
     // if (update._sendMessage) {
     //   res.json({ ok: true });
@@ -405,7 +406,7 @@ const handleWebhook = async (req, res) => {
     // }
 
 
-    res.json({ ok: true });
+    // res.json({ ok: true });
   } catch (error) {
     console.log(error)
     res.status(500).send(error);
