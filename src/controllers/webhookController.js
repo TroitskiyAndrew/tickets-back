@@ -361,9 +361,9 @@ const handleWebhook = async (req, res) => {
     const message = update.message;
     if (message) {
       if (message.text === "/start") {
-        await axios.post(`${config.tgApiUrl}/sendMessage`, {
+        await axios.post(`${config.tgApiUrl}/sendPhoto`, {
         chat_id: message.chat.id,
-        text: "Добро пожаловать!",
+        photo: config.mainImage,
         reply_markup: {
           inline_keyboard: [
             [
