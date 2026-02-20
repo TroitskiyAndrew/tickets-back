@@ -44,10 +44,13 @@ async function saveVisit(user, city = '') {
 
 async function pressedStart(userId) {
     let user  = await dataService.getDocumentByQuery('user', { userId });
-    console.log(userId)
-    if(!user.pressedStart){
-        user.pressedStart = true;
-        await dataService.updateDocument('user', user);
+    if(user) {
+        if(!user.pressedStart){
+            user.pressedStart = true;
+            await dataService.updateDocument('user', user);
+        }
+    } else {
+        console.log('_____неопознанный юзер_______', userId)
     }
 }
 
