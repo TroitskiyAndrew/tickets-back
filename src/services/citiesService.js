@@ -35,9 +35,11 @@ async function saveVisit(user, options) {
         dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: []})
     } 
     if(!dbUser.user) {
+        save = true;
         dbUser.user = user;
     }
     if(!dbUser.visits) {
+        save = true;
         dbUser.user = visits;
     }
     if(city && !dbUser.visits.includes(city)) {
