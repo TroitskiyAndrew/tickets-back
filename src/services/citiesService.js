@@ -23,7 +23,8 @@ async function getCities() {
     return sortedCities;
 }
 
-async function saveVisit(user, city = '') {
+async function saveVisit(user, options) {
+    const  {city, pressedStart } = options;
     const userId = user.id;
     dbUser = usersCache.get(user.id);
     if(!dbUser) {
@@ -35,7 +36,6 @@ async function saveVisit(user, city = '') {
     } 
     if(!dbUser.user) {
         dbUser.user = user;
-        
     }
     if(!dbUser.visits) {
         dbUser.user = visits;
@@ -44,20 +44,12 @@ async function saveVisit(user, city = '') {
         save = true;
         dbUser.visits.push(city)
     }
+    if (pressedStart && !dbUser.pressedStart) {
+        save = true;
+        dbUser.pressedStart = true;
+    }
     if(save){
         await dataService.updateDocument('user', dbUser);
-    }
-}
-
-async function pressedStart(userId) {
-    let user  = await dataService.getDocumentByQuery('user', { userId });
-    if(user) {
-        if(!user.pressedStart){
-            user.pressedStart = true;
-            await dataService.updateDocument('user', user);
-        }
-    } else {
-        await dataService.createDocument('user', { userId, pressedStart: true })
     }
 }
 
@@ -66,5 +58,4 @@ async function pressedStart(userId) {
 module.exports = {
     getCities: getCities,
     saveVisit: saveVisit,
-    pressedStart: pressedStart,
 };

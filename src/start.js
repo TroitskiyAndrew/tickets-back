@@ -35,7 +35,7 @@ const telegramInitDataMiddleware = async (req, res, next) => {
       // ToDo для локального тестирования
       req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
       next();
-      await citiesService.saveVisit(req.telegramData.user)
+      await citiesService.saveVisit(req.telegramData.user, {})
       return;
     }
 
@@ -59,7 +59,7 @@ const telegramInitDataMiddleware = async (req, res, next) => {
         return result;
       } , {}) 
       req.telegramData = telegramData;
-      await citiesService.saveVisit(telegramData.user)
+      await citiesService.saveVisit(telegramData.user, {})
       next();
     }
 

@@ -17,7 +17,7 @@ const saveVisitToCity = async (req, res) => {
   try {
     const {city} = req.body;
     const { user } = req.telegramData;
-    await cityService.saveVisit(user, city)
+    await cityService.saveVisit(user, {city})
     res.status(200).send(true);
     return;
   } catch (error) {
