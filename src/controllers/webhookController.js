@@ -154,6 +154,7 @@ const handleWebhook = async (req, res) => {
         const now = Date.now();
         console.log('start', now)
         try {
+          await citiesService.pressedStart(message.from.id);
           await axios.post(`${config.tgApiUrl}/sendPhoto`, {
             chat_id: message.chat.id,
             photo: config.bot,

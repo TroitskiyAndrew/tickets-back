@@ -71,6 +71,7 @@ const telegramInitDataMiddleware = (req, res, next) => {
 
 app.use(express.json());
 app.use(cors({ origin: config.frontURL, credentials: true }));
+app.use(telegramInitDataMiddleware);
 app.post("/webhook", webhookController.handleWebhook);
 
 
@@ -78,7 +79,6 @@ app.post("/webhook", webhookController.handleWebhook);
 app.get("/cities", cityController.getCities);
 app.get("/places", placeController.getPlaces);
 app.get("/qr/:ticketId", ticketsController.getQR);
-app.use(telegramInitDataMiddleware);
 app.post("/tickets", upload.single('image'), ticketsController.buyTickets);
 app.get("/tickets", ticketsController.getTickets);
 app.get("/ticket/:ticketId", ticketsController.getTicket);

@@ -20,6 +20,6 @@ module.exports = {
     rubAccount: process.env.RUB_ACCOUNT || 'по номеру 89126697190 на АльфаБанк',
     mainImage: process.env.MAIN_IMAGE || 'https://www.dropbox.com/scl/fi/effyav2xjnlc8rvdg5x56/main.jpeg?rlkey=073r242acvcathoutqiqipwyu&raw=1',
     wait: process.env.WAIT || 'https://www.dropbox.com/scl/fi/gll6m7uuzwi37cb6379bl/zhdun.jpg?rlkey=xmm48wmk0ri4ckudm5bde23ez&dl=0',
-    bot: process.env.BOT_IMAGE || 'https://www.dropbox.com/scl/fi/tebnrht0gxse0g2cm28qo/tg-v1.jpg?rlkey=gu3btnnojxg2xytqlen6n7avm&raw=1',
+    bot: process.env.BOT_IMAGE || 'https://www.dropbox.com/scl/fi/gpdjt5pi1vu795r9rikbg/bot.png?rlkey=idgmc8f1sppya03mz1dllzyfw&raw=1',
     eventTypes: process.env.EVENT_TYPES ? JSON.parse(process.env.EVENT_TYPES) : ['Стендап Концерт', 'Стендап Импровизация'],
 }

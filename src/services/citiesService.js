@@ -24,17 +24,25 @@ async function getCities() {
 
 async function saveVisit(user, city = '') {
     const userId = user.id;
-    const visits = await dataService.getDocuments('visits', { userId });
-    if (visits.length > 0 && !city) {
-        return;
+    let visit  = await dataService.getDocumentByQuery('visits', { userId });
+    let save = false;
+    if(!visit) {
+        visit = await dataService.createDocument('visits', {pressedStart: false, cities: []})
     }
-    const emptyVisit = visits.find(visit => !visit.city);
-    if (city && emptyVisit) {
-        await dataService.deleteDocument('visits', emptyVisit.id);
+    if(city && !visit.cities.includes(city)) {
+        save = true;
+        visit.cities.push(city)
     }
-    const existVisit = visits.find(visit => visit.city === city && visit.user);
-    if (!existVisit) {
-        await dataService.createDocument('visits', { userId, user, city })
+    if(save){
+        await dataService.updateDocument('visits', visit);
+    }
+}
+
+async function pressedStart(userId) {
+    let visit  = await dataService.getDocumentByQuery('visits', { userId });
+    if(!visit.pressedStart){
+        visit.pressedStart = true;
+        await dataService.updateDocument('visits', visit);
     }
 }
 
@@ -43,4 +51,5 @@ async function saveVisit(user, city = '') {
 module.exports = {
     getCities: getCities,
     saveVisit: saveVisit,
+    pressedStart: pressedStart,
 };
