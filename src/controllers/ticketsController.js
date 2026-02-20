@@ -38,7 +38,7 @@ const buyTickets = async (req, res) => {
     form.append('parse_mode', 'HTML');
     form.append('photo', fs.createReadStream(req.file.path));
     const userLink = `<a href="tg://user?id=${user.id}">${user.first_name || 'Пользователь'}</a>`;
-    form.append('caption', `Оплата от ${userLink} на сумму ${tickets.reduce((acc, ticket) => acc += ticket.price, 0)}${currency === 'VND' ? '.000 VND' : ' руб'} за ${tickets.length} билет${tickets.length === 1 ? '' : tickets.length <= 4 ? 'а' : 'ов'}`);
+    form.append('caption', `Оплата от ${userLink} на сумму ${tickets.reduce((acc, ticket) => acc += ticket.price, 0)}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : 'USDT'} за ${tickets.length} билет${tickets.length === 1 ? '' : tickets.length <= 4 ? 'а' : 'ов'}`);
     form.append('reply_markup', JSON.stringify({
       inline_keyboard: [
         [{ text: "Подтвердить", callback_data: `CONFIRM_${bookingId}` }],

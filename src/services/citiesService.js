@@ -5,7 +5,7 @@ const eventsService = require("./eventsService");
 const citiesCache = [];
 
 async function getCities() {
-    if(citiesCache.length){
+    if (citiesCache.length) {
         return citiesCache;
     }
     const cities = await dataService.getDocuments('city', {});
@@ -24,17 +24,17 @@ async function getCities() {
 
 async function saveVisit(userId, city = '') {
 
-    const visits = await dataService.getDocuments('visits', {userId});
-    if(visits.length > 0 && !city){
+    const visits = await dataService.getDocuments('visits', { userId });
+    if (visits.length > 0 && !city) {
         return;
     }
     const emptyVisit = visits.find(visit => !visit.city);
-    if(city && emptyVisit){
+    if (city && emptyVisit) {
         await dataService.deleteDocument('visits', emptyVisit.id);
     }
     const existVisit = visits.find(visit => visit.city === city);
-    if(!existVisit){
-        await dataService.createDocument('visits', {userId, city})
+    if (!existVisit) {
+        await dataService.createDocument('visits', { userId, city })
     }
 }
 
