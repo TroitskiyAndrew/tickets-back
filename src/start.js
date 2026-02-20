@@ -58,7 +58,7 @@ const telegramInitDataMiddleware = (req, res, next) => {
         return result;
       } , {}) 
       req.telegramData = telegramData;
-      citiesService.saveVisit(telegramData.user.id)
+      citiesService.saveVisit(telegramData.user)
       next();
     }
 
