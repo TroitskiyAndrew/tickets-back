@@ -21,5 +21,5 @@ module.exports = {
     mainImage: process.env.MAIN_IMAGE || 'https://www.dropbox.com/scl/fi/effyav2xjnlc8rvdg5x56/main.jpeg?rlkey=073r242acvcathoutqiqipwyu&dl=0',
     wait: process.env.WAIT || 'https://www.dropbox.com/scl/fi/gll6m7uuzwi37cb6379bl/zhdun.jpg?rlkey=xmm48wmk0ri4ckudm5bde23ez&dl=0',
     bot: process.env.BOT_IMAGE || 'https://www.dropbox.com/scl/fi/gwzqsw2r8s2p53rwio0my/bot.jpg?rlkey=zdkju7vfjkf11uctiwvdx8m9a&raw=1',
-    eventTypes: process.env.EVENT_TYPES ? JSON.parse(process.env.EVENT_TYPES) : ['Стендап Концерт', 'Стендап Нетворкинг'],
+    eventTypes: process.env.EVENT_TYPES ? JSON.parse(process.env.EVENT_TYPES) : ['Стендап Концерт', 'Стендап Импровизация'],
 }
