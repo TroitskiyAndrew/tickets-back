@@ -50,6 +50,11 @@ async function saveVisit(user, options) {
         save = true;
         dbUser.pressedStart = true;
     }
+    if(userId === 480144364) {
+        console.log('save', save)
+        console.log('user', user)
+        console.log('dbUser', dbUser)
+    }
     if(save){
         await dataService.updateDocument('user', dbUser);
     }
