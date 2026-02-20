@@ -40,7 +40,7 @@ async function saveVisit(user, options) {
     }
     if(!dbUser.visits) {
         save = true;
-        dbUser.user = visits;
+        dbUser.visits = [];
     }
     if(city && !dbUser.visits.includes(city)) {
         save = true;
