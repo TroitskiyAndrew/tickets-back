@@ -32,6 +32,13 @@ async function saveVisit(user, city = '') {
     let save = false;
     if(!dbUser) {
         dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: []})
+    } 
+    if(!dbUser.user) {
+        dbUser.user = user;
+        
+    }
+    if(!dbUser.visits) {
+        dbUser.user = visits;
     }
     if(city && !dbUser.visits.includes(city)) {
         save = true;
@@ -50,7 +57,7 @@ async function pressedStart(userId) {
             await dataService.updateDocument('user', user);
         }
     } else {
-        console.log('_____неопознанный юзер_______', userId)
+        await dataService.createDocument('user', { userId, pressedStart: true })
     }
 }
 
