@@ -44,6 +44,7 @@ async function saveVisit(user, city = '') {
 
 async function pressedStart(userId) {
     let user  = await dataService.getDocumentByQuery('user', { userId });
+    console.log(userId)
     if(!user.pressedStart){
         user.pressedStart = true;
         await dataService.updateDocument('user', user);
