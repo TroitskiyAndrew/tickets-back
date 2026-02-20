@@ -157,6 +157,7 @@ const handleWebhook = async (req, res) => {
           await axios.post(`${config.tgApiUrl}/sendPhoto`, {
             chat_id: message.chat.id,
             photo: config.bot,
+            caption: 'Привет! Заходи в приложение, чтобы узнать кто я такой и найти билеты на шоу в твоем городе', 
             reply_markup: {
               inline_keyboard: [
                 [
