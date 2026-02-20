@@ -24,25 +24,25 @@ async function getCities() {
 
 async function saveVisit(user, city = '') {
     const userId = user.id;
-    let visit  = await dataService.getDocumentByQuery('visits', { userId });
+    let visit  = await dataService.getDocumentByQuery('user', { userId });
     let save = false;
     if(!visit) {
-        visit = await dataService.createDocument('visits', {pressedStart: false, cities: []})
+        visit = await dataService.createDocument('user', {pressedStart: false, cities: []})
     }
     if(city && !visit.cities.includes(city)) {
         save = true;
         visit.cities.push(city)
     }
     if(save){
-        await dataService.updateDocument('visits', visit);
+        await dataService.updateDocument('user', visit);
     }
 }
 
 async function pressedStart(userId) {
-    let visit  = await dataService.getDocumentByQuery('visits', { userId });
+    let visit  = await dataService.getDocumentByQuery('user', { userId });
     if(!visit.pressedStart){
         visit.pressedStart = true;
-        await dataService.updateDocument('visits', visit);
+        await dataService.updateDocument('user', visit);
     }
 }
 
