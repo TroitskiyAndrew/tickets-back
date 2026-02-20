@@ -24,7 +24,7 @@ const server = http.createServer(app);
 
 socketService.initSocket(server)
 
-const telegramInitDataMiddleware = (req, res, next) => {
+const telegramInitDataMiddleware = async (req, res, next) => {
   try {
 
     // // ToDo для локального тестирования
@@ -35,6 +35,7 @@ const telegramInitDataMiddleware = (req, res, next) => {
       // ToDo для локального тестирования
       req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
       next();
+      await citiesService.saveVisit(telegramData.user)
       return;
     }
 
@@ -58,7 +59,7 @@ const telegramInitDataMiddleware = (req, res, next) => {
         return result;
       } , {}) 
       req.telegramData = telegramData;
-      citiesService.saveVisit(telegramData.user)
+      await citiesService.saveVisit(telegramData.user)
       next();
     }
 
