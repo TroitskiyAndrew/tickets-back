@@ -3,6 +3,7 @@ const dataService = require("./mongodb");
 const eventsService = require("./eventsService");
 
 const citiesCache = [];
+const usersCache = new Map()
 
 async function getCities() {
     if (citiesCache.length) {
@@ -24,10 +25,13 @@ async function getCities() {
 
 async function saveVisit(user, city = '') {
     const userId = user.id;
-    let dbUser  = await dataService.getDocumentByQuery('user', { userId });
+    dbUser = usersCache.get(user.id);
+    if(!dbUser) {
+        dbUser  = await dataService.getDocumentByQuery('user', { userId });
+    }
     let save = false;
     if(!dbUser) {
-        dbUser = await dataService.createDocument('user', {userId, pressedStart: false, visits: []})
+        dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: []})
     }
     if(city && !dbUser.visits.includes(city)) {
         save = true;
