@@ -80,6 +80,40 @@ const handleWebhook = async (req, res) => {
 
             break;
           }
+          case 'MARKETING': {
+            const tickets = await dataService.getDocuments('ticket', { bookingId: value });
+            await dataService.updateDocuments("ticket", { bookingId: value }, { $set: {type: 0, price: 0, confirmed: true } });
+            reply_markup.inline_keyboard = []
+            text = tickets.length > 1 ? 'Подтверждены бесплатные билеты: ' : 'Подтвержден бесплатный билет: ' + text;
+            await axios.post(`${config.tgApiUrl}/sendMessage`, {
+              chat_id: tickets[0].userId,
+              text: "Билет сейчас упадут в чат, плюс ты всегда сможешь найти их в приложении бота. Увидимся на шоу!",
+            });
+            for (const ticket of tickets) {
+              const event = await eventsService.getEvent(ticket.event);
+              const place = await dataService.getDocument('place', event.place)
+              const link = `${config.ticketUrlBase}${ticket.id}`;
+              const qrBuffer = await QRCode.toBuffer(link, {
+                type: 'png',
+                width: 512,
+                margin: 2,
+              });
+              const form = new FormData();
+              form.append('chat_id', ticket.userId);
+              form.append('photo', qrBuffer, { filename: 'qr.png' });
+              form.append('parse_mode', 'HTML');
+              const mapLink = `<a href="t${place.map}">${place.name}</a>`;
+              let caption = `Ваш билет на ${config.eventTypes[event.type]} в ${mapLink} ${event.date} ${event.start}`;
+              if (ticket.add) {
+                caption += `. В билет входит ${ticket.add}`
+              }
+              form.append('caption', caption);
+
+              await axios.post(`${config.tgApiUrl}/sendPhoto`, form);
+            }
+
+            break;
+          }
           case 'WRONG': {
             const tickets = await dataService.getDocuments('ticket', { bookingId: value });
             await axios.post(`${config.tgApiUrl}/sendMessage`, {

@@ -43,6 +43,7 @@ const buyTickets = async (req, res) => {
       inline_keyboard: [
         [{ text: "Подтвердить", callback_data: `CONFIRM_${bookingId}` }],
         [{ text: "Неправильная сумма", callback_data: `WRONG_${bookingId}` }],
+        [{ text: "Маркетинговые билеты", callback_data: `MARKETING_${bookingId}` }],
         [{ text: "Деньги не поступили", callback_data: `DROP_${bookingId}` }]
       ]
     }));
