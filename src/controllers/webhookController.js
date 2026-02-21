@@ -48,6 +48,10 @@ const handleWebhook = async (req, res) => {
         switch (action) {
           case 'CONFIRM': {
             const tickets = await dataService.getDocuments('ticket', { bookingId: value });
+            if(!tickets.length) {
+              console.log('___No tickets___')
+              return;
+            }
             await dataService.updateDocuments("ticket", { bookingId: value }, { $set: { confirmed: true } });
             reply_markup.inline_keyboard = []
             text = 'Подтверждено: ' + text;
@@ -83,6 +87,10 @@ const handleWebhook = async (req, res) => {
           case 'MARKETING': {
             const tickets = await dataService.getDocuments('ticket', { bookingId: value });
             await dataService.updateDocuments("ticket", { bookingId: value }, { $set: {type: 0, price: 0, confirmed: true } });
+            if(!tickets.length) {
+              console.log('___No tickets___')
+              return;
+            }
             reply_markup.inline_keyboard = []
             text = tickets.length > 1 ? 'Подтверждены бесплатные билеты: ' : 'Подтвержден бесплатный билет: ' + text;
             await axios.post(`${config.tgApiUrl}/sendMessage`, {
