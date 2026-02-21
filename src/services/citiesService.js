@@ -25,6 +25,10 @@ async function getCities() {
 
 async function saveVisit(user, options) {
     const  {city, pressedStart } = options;
+    if(!user){
+        console.log('__Не было юзера__')
+        return;
+    }
     const userId = user.id;
     dbUser = usersCache.get(user.id);
     if(!dbUser) {
