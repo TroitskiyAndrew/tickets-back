@@ -78,6 +78,24 @@ const getTickets = async (req, res) => {
   }
 };
 
+const getTicketsCounts = async (req, res) => {
+  try {
+    const event = await dataService.getDocument('event', req.params.eventId);
+    const tickets = await dataService.getDocuments('ticket', { event: req.params.eventId, confirmed: true });
+    const ticketsMap = tickets.reduce((map, ticket) => {
+      const count = map.get(ticket.type) || 0;
+      map.set(ticket.type, count + 1);
+      return map;
+    }, new Map());
+    res.status(200).send(event.tickets.map(ticket => ({...ticket, count: ticket.count - (ticketsMap.get(ticket.type) || 0)})));
+    return;
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error);
+    return;
+  }
+};
+
 const getTicket = async (req, res) => {
   try {
     const ticketId = req.params.ticketId;
@@ -151,4 +169,5 @@ module.exports = {
   getTickets: getTickets,
   getTicket: getTicket,
   getQR: getQR,
+  getTicketsCounts: getTicketsCounts,
 };
