@@ -49,7 +49,7 @@ const handleWebhook = async (req, res) => {
           case 'CONFIRM': {
             const tickets = await dataService.getDocuments('ticket', { bookingId: value });
             if(!tickets.length) {
-              console.log('___No tickets___')
+              console.log('___No tickets___', action, value)
               return;
             }
             await dataService.updateDocuments("ticket", { bookingId: value }, { $set: { confirmed: true } });
@@ -88,7 +88,7 @@ const handleWebhook = async (req, res) => {
             const tickets = await dataService.getDocuments('ticket', { bookingId: value });
             await dataService.updateDocuments("ticket", { bookingId: value }, { $set: {type: 0, price: 0, confirmed: true } });
             if(!tickets.length) {
-              console.log('___No tickets___')
+              console.log('___No tickets___', action, value)
               return;
             }
             reply_markup.inline_keyboard = []
