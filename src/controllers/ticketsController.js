@@ -1,4 +1,6 @@
 const dataService = require("../services/mongodb");
+const eventsService = require("../services/eventsService");
+const citiesService = require("../services/citiesService");
 const crypto = require("crypto");
 const fs = require("fs");
 const FormData = require("form-data");
@@ -7,7 +9,6 @@ const axios = require("axios");
 const QRCode = require("qrcode");
 
 const eventsMap = new Map();
-const citesMap = new Map();
 const placesMap = new Map();
 
 const buyTickets = async (req, res) => {
@@ -38,7 +39,12 @@ const buyTickets = async (req, res) => {
     form.append('parse_mode', 'HTML');
     form.append('photo', fs.createReadStream(req.file.path));
     const userLink = `<a href="tg://user?id=${user.id}">${user.first_name || 'Пользователь'}</a>`;
-    form.append('caption', `Оплата от ${userLink} на сумму ${tickets.reduce((acc, ticket) => acc += ticket.price, 0)}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : 'USDT'} за ${tickets.length} билет${tickets.length === 1 ? '' : tickets.length <= 4 ? 'а' : 'ов'}`);
+    const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
+    const ticketStrings = tickets.map(ticket => {
+      const event = eventsService.getEventFromCache(ticket.event);
+      return `${citiesService.citiesMap(event.city)} ${event.date} ${config.eventTypes[event.type]} ${config.ticketTypes[ticket.type]}`
+    })
+    form.append('caption', `Оплата от ${userLink} за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}`);
     form.append('reply_markup', JSON.stringify({
       inline_keyboard: [
         [{ text: "Подтвердить", callback_data: `CONFIRM_SPLIT_${bookingId}` }],
@@ -125,12 +131,12 @@ async function updateTicket(ticket) {
     ticket.event = event;
     ticket.add = event.tickets.find(t => t.type === ticket.type)?.add || '';
   }
-  if (citesMap.has(ticket.event.city)) {
+  if (citiesService.citesMap.has(ticket.event.city)) {
     const city = citesMap.get(ticket.event.city);
     ticket.city = city;
   } else {
     const city = await dataService.getDocument('city', ticket.event.city);
-    citesMap.set(ticket.event.city, city);
+    citiesService.citesMap.set(ticket.event.city, city);
     ticket.city = city;
   }
   if (placesMap.has(ticket.event.place)) {

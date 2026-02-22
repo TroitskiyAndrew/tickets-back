@@ -2,8 +2,13 @@ const { ObjectId } = require("mongodb");
 const dataService = require("./mongodb");
 const eventsService = require("./eventsService");
 
+const citiesMap = new Map();
+
 async function getCities() {
     const cities = await dataService.getDocuments('city', {});
+    for (const city of cities){
+       citiesMap.set(city.id, city) 
+    }
     const events = await eventsService.getEvents();
     const eventsMap = events.reduce((map, event) => {
         const events = map.get(event.city) || [];
@@ -18,4 +23,5 @@ async function getCities() {
 
 module.exports = {
     getCities: getCities,
+    citiesMap: citiesMap,
 };
