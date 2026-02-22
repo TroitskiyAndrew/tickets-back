@@ -132,7 +132,7 @@ async function updateTicket(ticket) {
     ticket.add = event.tickets.find(t => t.type === ticket.type)?.add || '';
   }
   if (citiesService.citiesMap.has(ticket.event.city)) {
-    const city = citiesMap.get(ticket.event.city);
+    const city = citiesService.citiesMap.get(ticket.event.city);
     ticket.city = city;
   } else {
     const city = await dataService.getDocument('city', ticket.event.city);
