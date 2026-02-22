@@ -42,6 +42,8 @@ const buyTickets = async (req, res) => {
     const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
     const ticketStrings = tickets.map(ticket => {
       const event = eventsService.getEventFromCache(ticket.event);
+      console.log('ticket', ticket)
+      console.log('event', event)
       return `${citiesService.citiesMap.get(event.city)} ${event.date} ${config.eventTypes[event.type]} ${config.ticketTypes[ticket.type]}`
     })
     form.append('caption', `Оплата от ${userLink} за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}`);
@@ -77,24 +79,6 @@ const getTickets = async (req, res) => {
       await updateTicket(ticket);
     }
     res.status(200).send(tickets);
-    return;
-  } catch (error) {
-    console.log(error)
-    res.status(500).send(error);
-    return;
-  }
-};
-
-const getTicketsCounts = async (req, res) => {
-  try {
-    const event = await dataService.getDocument('event', req.params.eventId);
-    const tickets = await dataService.getDocuments('ticket', { event: req.params.eventId, confirmed: true });
-    const ticketsMap = tickets.reduce((map, ticket) => {
-      const count = map.get(ticket.type) || 0;
-      map.set(ticket.type, count + 1);
-      return map;
-    }, new Map());
-    res.status(200).send(event.tickets.map(ticket => ({...ticket, count: ticket.count - (ticketsMap.get(ticket.type) || 0)})));
     return;
   } catch (error) {
     console.log(error)
