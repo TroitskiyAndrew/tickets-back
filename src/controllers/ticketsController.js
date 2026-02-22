@@ -45,7 +45,7 @@ const buyTickets = async (req, res) => {
       const event = await eventsService.getEventFromCache(ticket.event);
       console.log('ticket', ticket)
       console.log('event', event)
-      ticketStrings.push(`${citiesService.citiesMap.get(event.city)} ${event.date} ${config.eventTypes[event.type]} ${config.ticketTypes[ticket.type]}`) 
+      ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`) 
     };
     form.append('caption', `Оплата от ${userLink} за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}`);
     form.append('reply_markup', JSON.stringify({
