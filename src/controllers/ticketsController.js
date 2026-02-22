@@ -131,8 +131,8 @@ async function updateTicket(ticket) {
     ticket.event = event;
     ticket.add = event.tickets.find(t => t.type === ticket.type)?.add || '';
   }
-  if (citiesService.citesMap.has(ticket.event.city)) {
-    const city = citesMap.get(ticket.event.city);
+  if (citiesService.citiesMap.has(ticket.event.city)) {
+    const city = citiesMap.get(ticket.event.city);
     ticket.city = city;
   } else {
     const city = await dataService.getDocument('city', ticket.event.city);
