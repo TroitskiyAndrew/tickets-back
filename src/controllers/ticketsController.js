@@ -40,12 +40,13 @@ const buyTickets = async (req, res) => {
     form.append('photo', fs.createReadStream(req.file.path));
     const userLink = `<a href="tg://user?id=${user.id}">${user.first_name || 'Пользователь'}</a>`;
     const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
-    const ticketStrings = newTickets.map(async (ticket) => {
+    const ticketStrings = [] 
+    for (const ticket of newTickets){
       const event = await eventsService.getEventFromCache(ticket.event);
       console.log('ticket', ticket)
       console.log('event', event)
-      return `${citiesService.citiesMap.get(event.city)} ${event.date} ${config.eventTypes[event.type]} ${config.ticketTypes[ticket.type]}`
-    })
+      ticketStrings.push(`${citiesService.citiesMap.get(event.city)} ${event.date} ${config.eventTypes[event.type]} ${config.ticketTypes[ticket.type]}`) 
+    };
     form.append('caption', `Оплата от ${userLink} за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}`);
     form.append('reply_markup', JSON.stringify({
       inline_keyboard: [
