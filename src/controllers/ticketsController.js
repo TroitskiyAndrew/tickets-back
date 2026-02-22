@@ -40,8 +40,8 @@ const buyTickets = async (req, res) => {
     form.append('photo', fs.createReadStream(req.file.path));
     const userLink = `<a href="tg://user?id=${user.id}">${user.first_name || 'Пользователь'}</a>`;
     const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
-    const ticketStrings = tickets.map(ticket => {
-      const event = eventsService.getEventFromCache(ticket.event);
+    const ticketStrings = tickets.map(async (ticket) => {
+      const event = await eventsService.getEventFromCache(ticket.event);
       console.log('ticket', ticket)
       console.log('event', event)
       return `${citiesService.citiesMap.get(event.city)} ${event.date} ${config.eventTypes[event.type]} ${config.ticketTypes[ticket.type]}`
