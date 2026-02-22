@@ -1,24 +1,33 @@
-const { ObjectId } = require("mongodb");
 const dataService = require("./mongodb");
-const socketService = require("./socketService");
 
-const eventsCache = [];
+const eventsCache = new Map()
 
-async function getEventsByCity(city) {
-    const events = await getEvents();
-    return events.filter(event => event.city === city);
-}
 async function getEvents() {
-    if (eventsCache.length) {
-        return eventsCache;
-    }
     const events = await dataService.getDocuments('event', {});
-    eventsCache.push(...events);
+    for (const event of events) {
+        eventsCache.set(event.id, event)
+    }
     return events;
 }
 
 async function getEvent(id) {
     const event = await dataService.getDocument('event', id);
+    const tickets = await dataService.getDocuments('ticket', { event: id, confirmed: true });
+    const ticketsMap = tickets.reduce((map, ticket) => {
+        const count = map.get(ticket.type) || 0;
+        map.set(ticket.type, count + 1);
+        return map;
+    }, new Map());
+    event.tickets.forEach(ticket => {
+        ticket.count = ticket.count - (ticketsMap.get(ticket.type) || 0);
+    });
+    return event;
+}
+async function getEventFromCache(id) {
+    let event = eventsCache.get(id);
+    if (!event) {
+        event = await dataService.getDocument('event', id)
+    }
     return event;
 }
 
@@ -27,5 +36,5 @@ async function getEvent(id) {
 module.exports = {
     getEvents: getEvents,
     getEvent: getEvent,
-    getEventsByCity: getEventsByCity,
+    getEventFromCache: getEventFromCache,
 };

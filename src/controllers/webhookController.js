@@ -1,6 +1,7 @@
 const dataService = require("../services/mongodb");
 const citiesService = require("../services/citiesService");
 const eventsService = require("../services/eventsService");
+const userService = require("../services/userService");
 const QRCode = require("qrcode");
 const crypto = require("crypto");
 const config = require("../config/config");
@@ -60,7 +61,7 @@ const handleWebhook = async (req, res) => {
               text: "Йоу-йоу! Мы получили ваши деньги, все четко. Билеты сейчас упадут в чат, плюс ты всегда сможешь найти их в приложении бота. Увидимся на шоу!",
             });
             for (const ticket of tickets) {
-              const event = await eventsService.getEvent(ticket.event);
+              const event = await eventsService.getEventFromCache(ticket.event);
               const place = await dataService.getDocument('place', event.place)
               const link = `${config.ticketUrlBase}${ticket.id}`;
               const qrBuffer = await QRCode.toBuffer(link, {
@@ -98,7 +99,7 @@ const handleWebhook = async (req, res) => {
               text: "Билет сейчас упадут в чат, плюс ты всегда сможешь найти их в приложении бота. Увидимся на шоу!",
             });
             for (const ticket of tickets) {
-              const event = await eventsService.getEvent(ticket.event);
+              const event = await eventsService.getEventFromCache(ticket.event);
               const place = await dataService.getDocument('place', event.place)
               const link = `${config.ticketUrlBase}${ticket.id}`;
               const qrBuffer = await QRCode.toBuffer(link, {
@@ -196,7 +197,7 @@ const handleWebhook = async (req, res) => {
         const now = Date.now();
         console.log('start', now)
         try {
-          await citiesService.saveVisit(message.from, {pressedStart: true});
+          await userService.saveVisit(message.from, {pressedStart: true});
           await axios.post(`${config.tgApiUrl}/sendPhoto`, {
             chat_id: message.chat.id,
             photo: config.bot,

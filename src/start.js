@@ -8,8 +8,8 @@ const upload = multer({ dest: 'uploads/' });
 
 const config = require("./config/config");
 const usersController = require("./controllers/usersController");
-const membersController = require("./controllers/membersController");
-const paymentsController = require("./controllers/paymentsController");
+const eventsController = require("./controllers/eventsController");
+const userService = require("./services/userService");
 const ticketsController = require("./controllers/ticketsController");
 const placeController = require("./controllers/placeController");
 const webhookController = require("./controllers/webhookController");
@@ -35,7 +35,7 @@ const telegramInitDataMiddleware = async (req, res, next) => {
       // ToDo для локального тестирования
       req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
       next();
-      await citiesService.saveVisit(req.telegramData.user, {})
+      await userService.saveVisit(req.telegramData.user, {})
       return;
     }
 
@@ -59,7 +59,7 @@ const telegramInitDataMiddleware = async (req, res, next) => {
         return result;
       } , {}) 
       req.telegramData = telegramData;
-      await citiesService.saveVisit(telegramData.user, {})
+      await userService.saveVisit(telegramData.user, {})
       next();
     }
 
@@ -83,9 +83,9 @@ app.get("/qr/:ticketId", ticketsController.getQR);
 app.post("/tickets", upload.single('image'), ticketsController.buyTickets);
 app.get("/tickets", ticketsController.getTickets);
 app.get("/ticket/:ticketId", ticketsController.getTicket);
-app.post("/cities", cityController.saveVisitToCity);
+app.post("/cities", usersController.saveVisitToCity);
 app.get("/users/:userId", usersController.getUser);
-app.get("/counts/:eventId", ticketsController.getTicketsCounts);
+app.get("/event/:eventId", eventsController.getEvent);
 // app.post("/users", usersController.createUser);
 // app.put("/users", usersController.updateUser);
 
