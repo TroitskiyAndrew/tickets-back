@@ -171,10 +171,22 @@ const getQR = async (req, res) => {
   }
 };
 
+const getSoldTickets = async (req, res) => {
+  try {
+    const tickets = await dataService.getDocuments('ticket', { event: req.params.eventId, confirmed: true });
+    res.status(200).send(tickets);
+    return;
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error);
+    return;
+  }
+};
+
 module.exports = {
   buyTickets: buyTickets,
   getTickets: getTickets,
   getTicket: getTicket,
   getQR: getQR,
-  getTicketsCounts: getTicketsCounts,
+  getSoldTickets: getSoldTickets,
 };
