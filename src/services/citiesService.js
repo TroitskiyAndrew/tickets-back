@@ -5,9 +5,9 @@ const eventsService = require("./eventsService");
 const citiesMap = new Map();
 
 async function getCities() {
-    const cities = await dataService.getDocuments('city', {});
-    for (const city of cities){
-       citiesMap.set(city.id, city) 
+    let cities = [...citiesMap.values()];
+    if(!cities.length){
+        cities = await dataService.getDocuments('city', {});
     }
     const events = await eventsService.getEvents();
     const eventsMap = events.reduce((map, event) => {
@@ -20,6 +20,15 @@ async function getCities() {
     const sortedCities = cities.sort((a, b) => a.order - b.order);
     return sortedCities;
 }
+
+async function getCitiesToCache() {
+    const cities = await dataService.getDocuments('city', {});
+    for (const city of cities){
+       citiesMap.set(city.id, city) 
+    }
+}
+
+getCitiesToCache()
 
 module.exports = {
     getCities: getCities,
