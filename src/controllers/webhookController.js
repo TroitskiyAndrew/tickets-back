@@ -44,7 +44,7 @@ const handleWebhook = async (req, res) => {
         ])
         text = "Выберите город";
       } else {
-        const [action, value, context] = data.split('_');
+        const [action, value, context] = data.split('_SPLIT_');
         switch (action) {
           case 'CONFIRM': {
             const tickets = await dataService.getDocuments('ticket', { bookingId: value });

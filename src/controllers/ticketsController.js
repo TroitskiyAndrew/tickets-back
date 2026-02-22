@@ -41,10 +41,10 @@ const buyTickets = async (req, res) => {
     form.append('caption', `Оплата от ${userLink} на сумму ${tickets.reduce((acc, ticket) => acc += ticket.price, 0)}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : 'USDT'} за ${tickets.length} билет${tickets.length === 1 ? '' : tickets.length <= 4 ? 'а' : 'ов'}`);
     form.append('reply_markup', JSON.stringify({
       inline_keyboard: [
-        [{ text: "Подтвердить", callback_data: `CONFIRM_${bookingId}` }],
-        [{ text: "Неправильная сумма", callback_data: `WRONG_${bookingId}` }],
-        [{ text: "Маркетинговые билеты", callback_data: `MARKETING_${bookingId}` }],
-        [{ text: "Деньги не поступили", callback_data: `DROP_${bookingId}` }]
+        [{ text: "Подтвердить", callback_data: `CONFIRM_SPLIT_${bookingId}` }],
+        [{ text: "Неправильная сумма", callback_data: `WRONG_SPLIT_${bookingId}` }],
+        [{ text: "Маркетинговые билеты", callback_data: `MARKETING_SPLIT_${bookingId}` }],
+        [{ text: "Деньги не поступили", callback_data: `DROP_SPLIT_${bookingId}` }]
       ]
     }));
     await axios.post(`${config.tgApiUrl}/sendPhoto`, form,
