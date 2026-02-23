@@ -32,7 +32,22 @@ const saveVisitToCity = async (req, res) => {
   }
 };
 
+const saveSource = async (req, res) => {
+  try {
+    const {source} = req.body;
+    const { user } = req.telegramData;
+    await userService.saveSource(user, source)
+    res.status(200).send(true);
+    return;
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error);
+    return;
+  }
+};
+
 module.exports = {
   getUser: getUser,
   saveVisitToCity: saveVisitToCity,
+  saveSource: saveSource,
 };

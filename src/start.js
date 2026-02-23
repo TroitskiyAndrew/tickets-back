@@ -85,6 +85,7 @@ app.get("/tickets", ticketsController.getTickets);
 app.get("/ticket/:ticketId", ticketsController.getTicket);
 app.post("/cities", usersController.saveVisitToCity);
 app.get("/users/:userId", usersController.getUser);
+app.post("/users", usersController.saveSource);
 app.get("/event/:eventId", eventsController.getEvent);
 app.get("/sales/:eventId", ticketsController.getSoldTickets);
 // app.post("/users", usersController.createUser);
