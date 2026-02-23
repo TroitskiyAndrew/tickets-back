@@ -21,6 +21,7 @@ const buyTickets = async (req, res) => {
     }
     const bookingId = crypto.randomBytes(10).toString('base64url');
     const tickets = JSON.parse(ticketsString);
+    const dbUser = await dataService.getDocumentByQuery('user', {userId: user.id})
     const newTickets = tickets.map(ticket => ({
       userId: user.id,
       event: ticket.eventId,
@@ -32,7 +33,8 @@ const buyTickets = async (req, res) => {
       cashier: config.cashier,
       confirmed: false,
       add: ticket.add,
-      combo: ticket.combo
+      combo: ticket.combo,
+      source: dbUser.source
     }));
     await dataService.createDocuments('ticket', newTickets);
     const form = new FormData();
