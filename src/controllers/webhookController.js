@@ -49,7 +49,7 @@ const handleWebhook = async (req, res) => {
         switch (action) {
           case 'CONFIRM': {
             const tickets = await dataService.getDocuments('ticket', { bookingId: value });
-            if(!tickets.length) {
+            if (!tickets.length) {
               console.log('___No tickets___', action, value)
               return;
             }
@@ -82,13 +82,25 @@ const handleWebhook = async (req, res) => {
 
               await axios.post(`${config.tgApiUrl}/sendPhoto`, form);
             }
-
+            const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
+            const ticketStrings = []
+            for (const ticket of tickets) {
+              const event = await eventsService.getEventFromCache(ticket.event);
+              ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
+            };
+            const info = `Купили за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}`
+            for (const notify of config.salesNotifications){
+              await axios.post(`${config.tgApiUrl}/sendMessage`, {
+              chat_id: notify,
+              text: info,
+            });
+            }
             break;
           }
           case 'MARKETING': {
             const tickets = await dataService.getDocuments('ticket', { bookingId: value });
-            await dataService.updateDocuments("ticket", { bookingId: value }, { $set: {type: 0, price: 0, confirmed: true } });
-            if(!tickets.length) {
+            await dataService.updateDocuments("ticket", { bookingId: value }, { $set: { type: 0, price: 0, confirmed: true } });
+            if (!tickets.length) {
               console.log('___No tickets___', action, value)
               return;
             }
@@ -197,11 +209,11 @@ const handleWebhook = async (req, res) => {
         const now = Date.now();
         console.log('start', now)
         try {
-          await userService.saveVisit(message.from, {pressedStart: true});
+          await userService.saveVisit(message.from, { pressedStart: true });
           await axios.post(`${config.tgApiUrl}/sendPhoto`, {
             chat_id: message.chat.id,
             photo: config.bot,
-            caption: 'Жми на старт👇и хватай билеты на легендарные шоу любимого комика', 
+            caption: 'Жми на старт👇и хватай билеты на легендарные шоу любимого комика',
             reply_markup: {
               inline_keyboard: [
                 [
