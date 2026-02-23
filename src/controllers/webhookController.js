@@ -88,7 +88,7 @@ const handleWebhook = async (req, res) => {
               const event = await eventsService.getEventFromCache(ticket.event);
               ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
             };
-            const info = `Купили за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}`
+            const info = `Купили за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}`
             for (const notify of config.salesNotifications){
               await axios.post(`${config.tgApiUrl}/sendMessage`, {
               chat_id: notify,
