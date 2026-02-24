@@ -37,7 +37,7 @@ async function saveSource(user, source) {
     if(!dbUser) {
         dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: [], source})
     }
-    if(!dbUser.source){
+    if(source){
         save = true;
         dbUser.source = source;
     }
