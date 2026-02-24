@@ -66,12 +66,12 @@ const handleWebhook = async (req, res) => {
             };
             const source = tickets[0]?.source || '';
             const info = `Купили за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '. От ' + source : ''}`
-            // for (const notify of config.salesNotifications) {
-            //   await axios.post(`${config.tgApiUrl}/sendMessage`, {
-            //     chat_id: notify,
-            //     text: info,
-            //   });
-            // }
+            for (const notify of config.salesNotifications) {
+              await axios.post(`${config.tgApiUrl}/sendMessage`, {
+                chat_id: notify,
+                text: info,
+              });
+            }
             break;
           }
           case 'MARKETING': {
