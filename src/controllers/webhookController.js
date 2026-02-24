@@ -2,6 +2,7 @@ const dataService = require("../services/mongodb");
 const citiesService = require("../services/citiesService");
 const eventsService = require("../services/eventsService");
 const userService = require("../services/userService");
+const ticketsService = require("../services/ticketsService");
 const QRCode = require("qrcode");
 const crypto = require("crypto");
 const config = require("../config/config");
@@ -56,32 +57,7 @@ const handleWebhook = async (req, res) => {
             await dataService.updateDocuments("ticket", { bookingId: value }, { $set: { confirmed: true } });
             reply_markup.inline_keyboard = []
             text = 'Подтверждено: ' + text;
-            await axios.post(`${config.tgApiUrl}/sendMessage`, {
-              chat_id: tickets[0].userId,
-              text: "Йоу-йоу! Мы получили ваши деньги, все четко. Билеты сейчас упадут в чат, плюс ты всегда сможешь найти их в приложении бота. Увидимся на шоу!",
-            });
-            for (const ticket of tickets) {
-              const event = await eventsService.getEventFromCache(ticket.event);
-              const place = await dataService.getDocument('place', event.place)
-              const link = `${config.ticketUrlBase}${ticket.id}`;
-              const qrBuffer = await QRCode.toBuffer(link, {
-                type: 'png',
-                width: 512,
-                margin: 2,
-              });
-              const form = new FormData();
-              form.append('chat_id', ticket.userId);
-              form.append('photo', qrBuffer, { filename: 'qr.png' });
-              form.append('parse_mode', 'HTML');
-              const mapLink = `<a href="t${place.map}">${place.name}</a>`;
-              let caption = `Ваш билет на ${config.eventTypes[event.type]} в ${mapLink} ${event.date} ${event.start}`;
-              if (ticket.add) {
-                caption += `. В билет входит ${ticket.add}`
-              }
-              form.append('caption', caption);
-
-              await axios.post(`${config.tgApiUrl}/sendPhoto`, form);
-            }
+            await ticketsService.sendTickets({ bookingId: value });
             const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
             const ticketStrings = []
             for (const ticket of tickets) {
@@ -90,12 +66,12 @@ const handleWebhook = async (req, res) => {
             };
             const source = tickets[0]?.source || '';
             const info = `Купили за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '. От ' + source : ''}`
-            for (const notify of config.salesNotifications) {
-              await axios.post(`${config.tgApiUrl}/sendMessage`, {
-                chat_id: notify,
-                text: info,
-              });
-            }
+            // for (const notify of config.salesNotifications) {
+            //   await axios.post(`${config.tgApiUrl}/sendMessage`, {
+            //     chat_id: notify,
+            //     text: info,
+            //   });
+            // }
             break;
           }
           case 'MARKETING': {
@@ -107,32 +83,7 @@ const handleWebhook = async (req, res) => {
             }
             reply_markup.inline_keyboard = []
             text = tickets.length > 1 ? 'Подтверждены бесплатные билеты: ' : 'Подтвержден бесплатный билет: ' + text;
-            await axios.post(`${config.tgApiUrl}/sendMessage`, {
-              chat_id: tickets[0].userId,
-              text: "Билет сейчас упадут в чат, плюс ты всегда сможешь найти их в приложении бота. Увидимся на шоу!",
-            });
-            for (const ticket of tickets) {
-              const event = await eventsService.getEventFromCache(ticket.event);
-              const place = await dataService.getDocument('place', event.place)
-              const link = `${config.ticketUrlBase}${ticket.id}`;
-              const qrBuffer = await QRCode.toBuffer(link, {
-                type: 'png',
-                width: 512,
-                margin: 2,
-              });
-              const form = new FormData();
-              form.append('chat_id', ticket.userId);
-              form.append('photo', qrBuffer, { filename: 'qr.png' });
-              form.append('parse_mode', 'HTML');
-              const mapLink = `<a href="t${place.map}">${place.name}</a>`;
-              let caption = `Ваш билет на ${config.eventTypes[event.type]} в ${mapLink} ${event.date} ${event.start}`;
-              if (ticket.add) {
-                caption += `. В билет входит ${ticket.add}`
-              }
-              form.append('caption', caption);
-
-              await axios.post(`${config.tgApiUrl}/sendPhoto`, form);
-            }
+            await ticketsService.sendTickets({ bookingId: value }, true);
 
             break;
           }
@@ -211,6 +162,7 @@ const handleWebhook = async (req, res) => {
         console.log('start', now)
         try {
           await userService.saveVisit(message.from, { pressedStart: true });
+          await ticketsService.sendTickets({ userId: message.from.id }, true);
           await axios.post(`${config.tgApiUrl}/sendPhoto`, {
             chat_id: message.chat.id,
             photo: config.bot,
