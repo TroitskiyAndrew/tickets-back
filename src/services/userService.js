@@ -11,7 +11,7 @@ async function saveVisit(user, options) {
     let save = false;
     let dbUser = await dataService.getDocumentByQuery('user', {userId})
     if(!dbUser) {
-        dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: []})
+        dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: [], _created: new Date().toLocaleString()})
     } 
     if(city && !dbUser.visits.includes(city)) {
         save = true;

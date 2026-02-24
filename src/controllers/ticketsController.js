@@ -36,6 +36,7 @@ const buyTickets = async (req, res) => {
       combo: ticket.combo,
       source: dbUser.source,
       sent: false,
+      _created: new Date().toLocaleString(),
     }));
     await dataService.createDocuments('ticket', newTickets);
     const form = new FormData();
