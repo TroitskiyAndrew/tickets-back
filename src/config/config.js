@@ -22,5 +22,5 @@ module.exports = {
     wait: process.env.WAIT || 'https://www.dropbox.com/scl/fi/gll6m7uuzwi37cb6379bl/zhdun.jpg?rlkey=xmm48wmk0ri4ckudm5bde23ez&dl=0',
     bot: process.env.BOT_IMAGE || 'https://www.dropbox.com/scl/fi/gpdjt5pi1vu795r9rikbg/bot.png?rlkey=idgmc8f1sppya03mz1dllzyfw&raw=1',
     eventTypes: process.env.EVENT_TYPES ? JSON.parse(process.env.EVENT_TYPES) : ['Стендап Концерт', 'Стендап Импровизация'],
-    salesNotifications: process.env.SALES_NOTIFICATION ? JSON.parse(process.env.SALES_NOTIFICATION) : [655618706, 480144364],
+    salesNotifications: process.env.SALES_NOTIFICATION ? JSON.parse(process.env.SALES_NOTIFICATION) : [655618706, 480144364, 140779820],
 }
