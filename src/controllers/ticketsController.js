@@ -1,6 +1,7 @@
 const dataService = require("../services/mongodb");
 const eventsService = require("../services/eventsService");
 const citiesService = require("../services/citiesService");
+const utils = require("../services/utils");
 const crypto = require("crypto");
 const fs = require("fs");
 const FormData = require("form-data");
@@ -36,7 +37,7 @@ const buyTickets = async (req, res) => {
       combo: ticket.combo,
       source: dbUser.source,
       sent: false,
-      _created: new Date().toLocaleString(),
+      _created: utils.getDate(Date.now()),
     }));
     await dataService.createDocuments('ticket', newTickets);
     const form = new FormData();

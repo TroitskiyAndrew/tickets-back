@@ -1,5 +1,6 @@
 
 const dataService = require("./mongodb");
+const utils = require("../services/utils");
 
 async function saveVisit(user, options) {
     const  {city, pressedStart } = options;
@@ -11,7 +12,7 @@ async function saveVisit(user, options) {
     let save = false;
     let dbUser = await dataService.getDocumentByQuery('user', {userId})
     if(!dbUser?.userId) {
-        dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: [], _created: new Date().toLocaleString()})
+        dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: [], _created: utils.getDate(Date.now())})
     } 
     if(city && !dbUser.visits.includes(city)) {
         save = true;
@@ -35,7 +36,7 @@ async function saveSource(user, source) {
     let save = false;
     let dbUser = await dataService.getDocumentByQuery('user', {userId})
     if(!dbUser?.userId) {
-        dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: [], source})
+        dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: [], source, _created: utils.getDate(Date.now())})
     }
     if(source){
         save = true;

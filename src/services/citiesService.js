@@ -1,6 +1,7 @@
 const { ObjectId } = require("mongodb");
 const dataService = require("./mongodb");
 const eventsService = require("./eventsService");
+const utils = require("./utils");
 const axios = require("axios");
 const config = require("../config/config");
 
@@ -25,11 +26,12 @@ async function getCities() {
     //     text: "Доброе утро, наш сотрудник не смог связаться с вами, так как ваш аккаунт в телеграмме скрыт. ПОжалуйста, напишите @s_gruzdova чтобы купить билеты за наличные",
     // });
 
+
     return sortedCities;
 }
 
 async function getCitiesToCache() {
-    const cities = (await dataService.getDocuments('city', {})) || [] ;
+    const cities = (await dataService.getDocuments('city', {})) || [];
     for (const city of cities) {
         citiesMap.set(city.id, city)
     }
