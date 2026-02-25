@@ -194,7 +194,7 @@ const handleWebhook = async (req, res) => {
           text: `Сообщение от ${userLink}`,
         });
         await axios.post(`${config.tgApiUrl}/forwardMessage`, {
-          chat_id: 480144364,
+          chat_id: config.cashier,
           from_chat_id: message.chat.id,
           message_id: message.message_id
         });
