@@ -168,6 +168,7 @@ const handleWebhook = async (req, res) => {
         try {
           await userService.saveVisit(message.from, { pressedStart: true });
           await ticketsService.sendTickets({ userId: message.from.id }, { marketing: true });
+          console.log(config.bot, config.bot)
           await axios.post(`${config.tgApiUrl}/sendPhoto`, {
             chat_id: message.chat.id,
             photo: config.bot,
