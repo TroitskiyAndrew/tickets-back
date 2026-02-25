@@ -90,6 +90,7 @@ app.get("/event/:eventId", eventsController.getEvent);
 app.get("/sales/:eventId", ticketsController.getSoldTickets);
 app.get("/find/:query", usersController.findUsers);
 app.post("/cash", ticketsController.buyTicketsForCash);
+app.post("/message", usersController.sendMessage);
 // app.post("/users", usersController.createUser);
 // app.put("/users", usersController.updateUser);
 

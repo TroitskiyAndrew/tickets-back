@@ -3,12 +3,14 @@ const { ObjectId } = require("mongodb");
 const userService = require("../services/userService");
 const sharesService = require("../services/sharesService");
 const roomsService = require("../services/roomsService");
-const socketService = require("../services/socketService");
+const ticketsService = require("../services/ticketsService");
+const axios = require("axios");
+const config = require("../config/config");
 
 
 const getUser = async (req, res) => {
   try {
-    const user = await dataService.getDocumentByQuery("user", {userId:  Number(req.params.userId)});
+    const user = await dataService.getDocumentByQuery("user", { userId: Number(req.params.userId) });
     res.status(200).send(user);
     return;
   } catch (error) {
@@ -20,9 +22,9 @@ const getUser = async (req, res) => {
 
 const saveVisitToCity = async (req, res) => {
   try {
-    const {city} = req.body;
+    const { city } = req.body;
     const { user } = req.telegramData;
-    await userService.saveVisit(user, {city})
+    await userService.saveVisit(user, { city })
     res.status(200).send(true);
     return;
   } catch (error) {
@@ -34,7 +36,7 @@ const saveVisitToCity = async (req, res) => {
 
 const saveSource = async (req, res) => {
   try {
-    const {source} = req.body;
+    const { source } = req.body;
     const { user } = req.telegramData;
     await userService.saveSource(user, source)
     res.status(200).send(true);
@@ -58,9 +60,28 @@ const findUsers = async (req, res) => {
   }
 };
 
+const sendMessage = async (req, res) => {
+  try {
+    const user = { id: 480144364, first_name: 'Test' };
+    const userLink = `<a href="tg://user?id=${user.id}">${user.first_name || 'Пользователь'}</a>`;
+    await axios.post(`${config.tgApiUrl}/sendMessage`, {
+      chat_id: 480144364,
+      parse_mode: 'HTML',
+      text: `Сообщение от ${userLink}`,
+    });
+    res.status(200).send(true);
+    return;
+  } catch (error) {
+    console.log(error)
+    res.status(500).send([]);
+    return;
+  }
+};
+
 module.exports = {
   getUser: getUser,
   saveVisitToCity: saveVisitToCity,
   saveSource: saveSource,
   findUsers: findUsers,
+  sendMessage: sendMessage,
 };

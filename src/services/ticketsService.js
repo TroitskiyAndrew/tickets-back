@@ -12,7 +12,7 @@ const FormData = require("form-data");
 async function sendTickets(query, options = {}) {
     try {
         const {marketing, sendTo} = options;
-        const tickets = await dataService.getDocuments('ticket', {...query, sent: false});
+        const tickets = await dataService.getDocuments('ticket', {...query, sent: false, confirmed: true});
         if (!tickets.length) {
             console.log('___No tickets___', query)
             return;
@@ -47,7 +47,7 @@ async function sendTickets(query, options = {}) {
 
             await axios.post(`${config.tgApiUrl}/sendPhoto`, form);
         }
-        await dataService.updateDocuments('ticket', {...query, sent: false}, { $set: { sent: true } });
+        await dataService.updateDocuments('ticket', {...query, sent: false, confirmed: true}, { $set: { sent: true } });
         return true;
 
     } catch (error) {

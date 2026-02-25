@@ -65,7 +65,11 @@ const handleWebhook = async (req, res) => {
               ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
             };
             const source = tickets[0]?.source || '';
-            const info = `Купили за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '. От ' + source : ''}`
+            const dbUser = (await dataService.getDocumentByQuery('user', { userId: tickets[0].userId })) || {};
+            const {user} = dbUser;
+            const userLink = `<a href="tg://user?id=${user?.id}">${user?.first_name || 'Пользователь'}</a>`;
+            const info = `${userLink} купил билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '. От ' + source : ''}`
+            text = `Подтверждена оплата от ${userLink} за: ${ticketStrings.join(', ')}. На общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '. От ' + source : ''}`
             for (const notify of config.salesNotifications) {
               await axios.post(`${config.tgApiUrl}/sendMessage`, {
                 chat_id: notify,
@@ -83,7 +87,7 @@ const handleWebhook = async (req, res) => {
             }
             reply_markup.inline_keyboard = []
             text = tickets.length > 1 ? 'Подтверждены бесплатные билеты: ' : 'Подтвержден бесплатный билет: ' + text;
-            await ticketsService.sendTickets({ bookingId: value }, {marketing: true});
+            await ticketsService.sendTickets({ bookingId: value }, { marketing: true });
 
             break;
           }
@@ -162,7 +166,7 @@ const handleWebhook = async (req, res) => {
         console.log('start', now)
         try {
           await userService.saveVisit(message.from, { pressedStart: true });
-          await ticketsService.sendTickets({ userId: message.from.id }, {marketing: true});
+          await ticketsService.sendTickets({ userId: message.from.id }, { marketing: true });
           await axios.post(`${config.tgApiUrl}/sendPhoto`, {
             chat_id: message.chat.id,
             photo: config.bot,
@@ -181,11 +185,19 @@ const handleWebhook = async (req, res) => {
         console.log('end', Date.now() - now)
         return;
       } else {
+        const user = message.chat.from;
+        const userLink = `<a href="tg://user?id=${user.id}">${user.first_name || 'Пользователь'}</a>`;
+        await axios.post(`${config.tgApiUrl}/sendMessage`, {
+          chat_id: config.cashier,
+          parse_mode: 'HTML',
+          text: `Сообщение от ${userLink}`,
+        });
         await axios.post(`${config.tgApiUrl}/forwardMessage`, {
           chat_id: config.cashier,
           from_chat_id: message.chat.id,
           message_id: message.message_id
         });
+
       }
     }
 
