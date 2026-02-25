@@ -89,7 +89,7 @@ async function getCities() {
     // }
     // console.log('success', success.length)
     // console.log('fail', fail.length)
-
+    // await dataService.updateDocuments('event', {}, {$set: {cashiers: [480144364, 655618706, 692369447]}})
     return sortedCities;
 }
 
