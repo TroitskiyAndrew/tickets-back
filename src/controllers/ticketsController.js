@@ -15,7 +15,7 @@ const placesMap = new Map();
 
 const buyTickets = async (req, res) => {
   try {
-    const {  currency, tickets: ticketsString } = req.body;
+    const { currency, tickets: ticketsString } = req.body;
     const { user } = req.telegramData;
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -23,7 +23,7 @@ const buyTickets = async (req, res) => {
     }
     const bookingId = crypto.randomBytes(10).toString('base64url');
     const tickets = JSON.parse(ticketsString);
-    const dbUser = await dataService.getDocumentByQuery('user', {userId: user.id})
+    const dbUser = await dataService.getDocumentByQuery('user', { userId: user.id })
     const newTickets = tickets.map(ticket => ({
       userId: user.id,
       event: ticket.eventId,
@@ -48,10 +48,10 @@ const buyTickets = async (req, res) => {
     form.append('photo', fs.createReadStream(req.file.path));
     const userLink = `<a href="tg://user?id=${user.id}">${user.first_name || 'Пользователь'}</a>`;
     const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
-    const ticketStrings = [] 
-    for (const ticket of newTickets){
+    const ticketStrings = []
+    for (const ticket of newTickets) {
       const event = await eventsService.getEventFromCache(ticket.event);
-      ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`) 
+      ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
     };
     const source = dbUser?.source || '';
     form.append('caption', `Оплата от ${userLink} за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${source ? '. От ' + source : ''}`);
@@ -77,14 +77,14 @@ const buyTickets = async (req, res) => {
 
 const buyTicketsForCash = async (req, res) => {
   try {
-    const {  currency, tickets, userId, cashier, checked } = req.body;
+    const { currency, tickets, userId, cashier, checked } = req.body;
     const { user } = req.telegramData;
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
     const bookingId = crypto.randomBytes(10).toString('base64url');
-    const dbUser = await dataService.getDocumentByQuery('user', {userId})
+    const dbUser = await dataService.getDocumentByQuery('user', { userId })
     const newTickets = tickets.map(ticket => ({
       userId,
       event: ticket.eventId,
@@ -104,6 +104,21 @@ const buyTicketsForCash = async (req, res) => {
     }));
     await dataService.createDocuments('ticket', newTickets);
     await ticketsService.sendTickets({ bookingId }, tickets[0].type === 0);
+
+    const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
+    const ticketStrings = []
+    for (const ticket of tickets) {
+      const event = await eventsService.getEventFromCache(ticket.event);
+      ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
+    };
+    const source = newTickets[0]?.source || '';
+    const info = `Купили за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '. От ' + source : ''}`
+    for (const notify of config.salesNotifications) {
+      await axios.post(`${config.tgApiUrl}/sendMessage`, {
+        chat_id: notify,
+        text: info,
+      });
+    }
     res.status(200).send(newTickets);
     return;
   } catch (error) {
@@ -137,7 +152,7 @@ const getTicket = async (req, res) => {
   try {
     const ticketId = req.params.ticketId;
     const ticket = await dataService.getDocument('ticket', ticketId);
-    if(!ticket){
+    if (!ticket) {
       res.status(404).json({ error: 'Ticket not found' });
       return;
     }
