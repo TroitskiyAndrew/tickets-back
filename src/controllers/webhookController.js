@@ -186,7 +186,7 @@ const handleWebhook = async (req, res) => {
         console.log('end', Date.now() - now)
         return;
       } else {
-        const user = message.chat.from;
+        const user = message.from;
         const userLink = `<a href="tg://user?id=${user.id}">${user.first_name || 'Пользователь'}</a>`;
         await axios.post(`${config.tgApiUrl}/sendMessage`, {
           chat_id: config.cashier,
