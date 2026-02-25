@@ -77,7 +77,7 @@ const buyTickets = async (req, res) => {
 
 const buyTicketsForCash = async (req, res) => {
   try {
-    const { currency, tickets, userId, cashier, checked } = req.body;
+    const { currency, tickets, userId, cashier, checked, sendTo } = req.body;
     const { user } = req.telegramData;
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -103,12 +103,12 @@ const buyTicketsForCash = async (req, res) => {
       checked,
     }));
     await dataService.createDocuments('ticket', newTickets);
-    await ticketsService.sendTickets({ bookingId }, tickets[0].type === 0);
+    await ticketsService.sendTickets({ bookingId }, {marketing: tickets[0].type === 0, sendTo});
 
     const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
     const ticketStrings = []
     for (const ticket of tickets) {
-      const event = await eventsService.getEventFromCache(ticket.event);
+      const event = await eventsService.getEventFromCache(ticket.eventId);
       ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
     };
     const source = newTickets[0]?.source || '';

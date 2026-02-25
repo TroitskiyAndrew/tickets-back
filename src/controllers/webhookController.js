@@ -83,7 +83,7 @@ const handleWebhook = async (req, res) => {
             }
             reply_markup.inline_keyboard = []
             text = tickets.length > 1 ? 'Подтверждены бесплатные билеты: ' : 'Подтвержден бесплатный билет: ' + text;
-            await ticketsService.sendTickets({ bookingId: value }, true);
+            await ticketsService.sendTickets({ bookingId: value }, {marketing: true});
 
             break;
           }
@@ -162,7 +162,7 @@ const handleWebhook = async (req, res) => {
         console.log('start', now)
         try {
           await userService.saveVisit(message.from, { pressedStart: true });
-          await ticketsService.sendTickets({ userId: message.from.id }, true);
+          await ticketsService.sendTickets({ userId: message.from.id }, {marketing: true});
           await axios.post(`${config.tgApiUrl}/sendPhoto`, {
             chat_id: message.chat.id,
             photo: config.bot,

@@ -9,18 +9,21 @@ const FormData = require("form-data");
 
 
 
-async function sendTickets(query, marketing = false) {
+async function sendTickets(query, options = {}) {
     try {
+        const {marketing, sendTo} = options;
         const tickets = await dataService.getDocuments('ticket', {...query, sent: false});
         if (!tickets.length) {
             console.log('___No tickets___', query)
             return;
         }
         const congratsText = marketing ? "Билет сейчас упадут в чат, плюс ты всегда сможешь найти их в приложении бота. Увидимся на шоу!" : "Йоу-йоу! Мы получили ваши деньги, все четко. Билеты сейчас упадут в чат, плюс ты всегда сможешь найти их в приложении бота. Увидимся на шоу!"
-        await axios.post(`${config.tgApiUrl}/sendMessage`, {
-            chat_id: tickets[0].userId,
-            text: congratsText,
-        });
+        if(!sendTo) {
+            await axios.post(`${config.tgApiUrl}/sendMessage`, {
+                chat_id: tickets[0].userId,
+                text: congratsText,
+            });
+        }
         for (const ticket of tickets) {
             const event = await eventsService.getEventFromCache(ticket.event);
             const place = await dataService.getDocument('place', event.place)
@@ -31,7 +34,7 @@ async function sendTickets(query, marketing = false) {
                 margin: 2,
             });
             const form = new FormData();
-            form.append('chat_id', ticket.userId);
+            form.append('chat_id', sendTo || ticket.userId);
             form.append('photo', qrBuffer, { filename: 'qr.png' });
             form.append('parse_mode', 'HTML');
             const mapLink = `<a href="t${place.map}">${place.name}</a>`;
