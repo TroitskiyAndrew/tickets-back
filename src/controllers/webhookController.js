@@ -73,6 +73,7 @@ const handleWebhook = async (req, res) => {
             for (const notify of config.salesNotifications) {
               await axios.post(`${config.tgApiUrl}/sendMessage`, {
                 chat_id: notify,
+                parse_mode: 'HTML',
                 text: info,
               });
             }
