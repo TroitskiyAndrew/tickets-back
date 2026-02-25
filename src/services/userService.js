@@ -10,7 +10,7 @@ async function saveVisit(user, options) {
     const userId = user.id;
     let save = false;
     let dbUser = await dataService.getDocumentByQuery('user', {userId})
-    if(!dbUser) {
+    if(!dbUser?.userId) {
         dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: [], _created: new Date().toLocaleString()})
     } 
     if(city && !dbUser.visits.includes(city)) {
@@ -34,7 +34,7 @@ async function saveSource(user, source) {
     const userId = user.id;
     let save = false;
     let dbUser = await dataService.getDocumentByQuery('user', {userId})
-    if(!dbUser) {
+    if(!dbUser?.userId) {
         dbUser = await dataService.createDocument('user', {user, userId, pressedStart: false, visits: [], source})
     }
     if(source){
