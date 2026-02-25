@@ -1,6 +1,7 @@
 const dataService = require("../services/mongodb");
 const eventsService = require("../services/eventsService");
 const citiesService = require("../services/citiesService");
+const ticketsService = require("../services/ticketsService");
 const utils = require("../services/utils");
 const crypto = require("crypto");
 const fs = require("fs");
@@ -38,6 +39,7 @@ const buyTickets = async (req, res) => {
       source: dbUser.source,
       sent: false,
       _created: utils.getDate(Date.now()),
+      checked: false
     }));
     await dataService.createDocuments('ticket', newTickets);
     const form = new FormData();
@@ -64,6 +66,44 @@ const buyTickets = async (req, res) => {
     await axios.post(`${config.tgApiUrl}/sendPhoto`, form,
       { headers: form.getHeaders() });
 
+    res.status(200).send(newTickets);
+    return;
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error);
+    return;
+  }
+};
+
+const buyTicketsForCash = async (req, res) => {
+  try {
+    const {  currency, tickets, userId, cashier, checked } = req.body;
+    const { user } = req.telegramData;
+    if (!user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+    const bookingId = crypto.randomBytes(10).toString('base64url');
+    const dbUser = await dataService.getDocumentByQuery('user', {userId})
+    const newTickets = tickets.map(ticket => ({
+      userId,
+      event: ticket.eventId,
+      bookingId,
+      type: ticket.type,
+      currency,
+      method: 'cash',
+      price: ticket.price,
+      cashier,
+      confirmed: true,
+      add: ticket.add,
+      combo: ticket.combo,
+      source: dbUser.source,
+      sent: false,
+      _created: utils.getDate(Date.now()),
+      checked,
+    }));
+    await dataService.createDocuments('ticket', newTickets);
+    await ticketsService.sendTickets({ bookingId }, tickets[0].type === 0);
     res.status(200).send(newTickets);
     return;
   } catch (error) {
@@ -179,4 +219,5 @@ module.exports = {
   getTicket: getTicket,
   getQR: getQR,
   getSoldTickets: getSoldTickets,
+  buyTicketsForCash: buyTicketsForCash,
 };
