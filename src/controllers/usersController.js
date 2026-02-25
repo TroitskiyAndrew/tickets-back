@@ -46,8 +46,21 @@ const saveSource = async (req, res) => {
   }
 };
 
+const findUsers = async (req, res) => {
+  try {
+    const users = await userService.findUsers(req.params.query)
+    res.status(200).send(users);
+    return;
+  } catch (error) {
+    console.log(error)
+    res.status(500).send([]);
+    return;
+  }
+};
+
 module.exports = {
   getUser: getUser,
   saveVisitToCity: saveVisitToCity,
   saveSource: saveSource,
+  findUsers: findUsers,
 };
