@@ -27,6 +27,69 @@ async function getCities() {
     // });
 
 
+    // const users = await dataService.aggregate('user', [
+    //     {
+    //         $lookup: {
+    //             from: "ticket",
+    //             let: { userId: "$userId" },
+    //             pipeline: [
+    //                 {
+    //                     $match: {
+    //                         $expr: {
+    //                             $eq: ["$userId", "$$userId"]
+    //                         }
+    //                     }
+    //                 },
+    //                 { $limit: 1 }
+    //             ],
+    //             as: "tickets"
+    //         }
+    //     },
+    //     {
+    //         $match: {
+    //             $and: [
+    //                 { tickets: { $size: 0 } },   // нет билетов
+    //                 {
+    //                     $or: [
+    //                         { visits: { $size: 0 } },                    // пустой массив
+    //                         { visits: "6984917c43c748577e5f8700" }        // содержит значение
+    //                     ]
+    //                 }
+    //             ]
+    //         }
+    //     }
+    // ])
+    // const ids = users.map(user => user.userId).filter(id => id !== 140779820);
+    // const success = [];
+    // const fail = [];
+    // for (const id of ids) {
+    //     try {
+    //         await axios.post(`${config.tgApiUrl}/sendPhoto`, {
+    //             chat_id: id,
+    //             photo: 'https://www.dropbox.com/scl/fi/pfxe9l923hal1imq5lhq9/what.jpg?rlkey=9vk13epfpfnont2jcjq90z8oi&raw=1',
+    //             parse_mode: 'HTML',
+    //             caption: 'Я ВСЕ ЕЩЕ ЖДУ ПОКА ТЫ КУПИШЬ БИЛЕТ И МЫ ЗНАТНО ПОУГОРАЕМ\nПочти все места уже расхватали',
+    //             reply_markup: {
+    //               inline_keyboard: [
+    //                 [
+    //                   { text: "Нячанг 27.02 Стендап-Концерт", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_RECALL_SEP_EVENT_SPLIT_6985e0b43677bfc5bc8757bb' },
+    //                 ],
+    //                 [
+    //                   { text: "Нячанг 01.03 Шоу-ипровизация", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_RECALL_SEP_EVENT_SPLIT_6985e0b43677bfc5bc8757bc' },
+    //                 ]
+    //               ]
+    //             },
+    //         });
+    //         console.log('sent to ',id )
+    //         success.push(id)
+            
+    //     } catch (error) {
+    //         fail.push(id)
+    //     }
+    // }
+    // console.log('success', success.length)
+    // console.log('fail', fail.length)
+
     return sortedCities;
 }
 
