@@ -46,7 +46,7 @@ const buyTickets = async (req, res) => {
     form.append('chat_id', config.cashier);
     form.append('parse_mode', 'HTML');
     form.append('photo', fs.createReadStream(req.file.path));
-    const userLink = `<a href="tg://user?id=${user.id}">${user.first_name || 'Пользователь'}</a>`;
+    const userLink = `<a href="https://t.me/${user.username}">${user.first_name || user.username || 'Пользователь'}</a>`;
     const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
     const ticketStrings = []
     for (const ticket of newTickets) {
@@ -103,7 +103,7 @@ const buyTicketsForCash = async (req, res) => {
       checked,
     }));
     await dataService.createDocuments('ticket', newTickets);
-    await ticketsService.sendTickets({ bookingId }, {marketing: tickets[0].type === 0, sendTo});
+    await ticketsService.sendTickets({ bookingId }, { marketing: tickets[0].type === 0, sendTo });
 
     const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
     const ticketStrings = []
@@ -112,7 +112,7 @@ const buyTicketsForCash = async (req, res) => {
       ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
     };
     const source = newTickets[0]?.source || '';
-    const userLink = `<a href="tg://user?id=${dbUser?.user?.id}">${dbUser?.user?.first_name || 'Пользователь'}</a>`;
+    const userLink = `<a href="https://t.me/${dbUser?.user?.username}">${dbUser?.user?.first_name || dbUser?.user?.username || 'Пользователь'}</a>`;
     const info = `${userLink} купил:\n ${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\nОт ' + source : ''}`
     for (const notify of config.salesNotifications) {
       await axios.post(`${config.tgApiUrl}/sendMessage`, {

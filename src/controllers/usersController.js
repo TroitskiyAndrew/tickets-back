@@ -62,8 +62,8 @@ const findUsers = async (req, res) => {
 
 const sendMessage = async (req, res) => {
   try {
-    const user = { id: 480144364, first_name: 'Test' };
-    const userLink = `<a href="tg://user?id=${user.id}">${user.first_name || 'Пользователь'}</a>`;
+    const user = { id: 480144364, first_name: 'Test', username:'alevtina_psychologist'  };
+     const userLink = `<a href="https://t.me/${user.username}">${user.first_name || user.username || 'Пользователь'}</a>`;
     await axios.post(`${config.tgApiUrl}/sendMessage`, {
       chat_id: 480144364,
       parse_mode: 'HTML',
