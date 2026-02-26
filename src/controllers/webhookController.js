@@ -68,7 +68,7 @@ const handleWebhook = async (req, res) => {
             const dbUser = (await dataService.getDocumentByQuery('user', { userId: tickets[0].userId })) || {};
             const { user } = dbUser;
             const userLink = `<a href="https://t.me/${user.username}">${user.first_name || user.username || 'Пользователь'}</a>`;
-            const info = `${userLink} купил билеты:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\n От ' + source : ''}`
+            const info = `${userLink} купил:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\n От ' + source : ''}`
             text = `Подтверждена оплата от ${userLink} за:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\n От ' + source : ''}`
             for (const notify of config.salesNotifications) {
               await axios.post(`${config.tgApiUrl}/sendMessage`, {
