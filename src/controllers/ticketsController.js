@@ -9,6 +9,7 @@ const FormData = require("form-data");
 const config = require("../config/config");
 const axios = require("axios");
 const QRCode = require("qrcode");
+const { ObjectId } = require("mongodb");
 
 const eventsMap = new Map();
 const placesMap = new Map();
@@ -230,6 +231,39 @@ const getSoldTickets = async (req, res) => {
   }
 };
 
+const changeTicketStatus = async (req, res) => {
+  try {
+    let result = false;
+    const { user } = req.telegramData;
+    if (!user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+    const {ticketId, inside} = req.body;
+    const ticket = await dataService.getDocument('ticket', ticketId);
+    if (!ticket) {
+      res.status(404).json({ error: 'Not Found' });
+      return;
+    }
+    const event = await eventsService.getEventFromCache(ticket.event);
+    if (!event) {
+      res.status(404).json({ error: 'Not Found' });
+      return;
+    }
+    if((event.entrance || []).includes(user.id)){
+      await dataService.updateDocumentByQuery('ticket', {_id: new ObjectId(ticketId)}, {$set: {checked: inside}})
+      ticket.checked = inside;
+      result = true;
+    }
+
+    res.status(200).send(result);
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error);
+    return;
+  }
+};
+
 module.exports = {
   buyTickets: buyTickets,
   getTickets: getTickets,
@@ -237,4 +271,5 @@ module.exports = {
   getQR: getQR,
   getSoldTickets: getSoldTickets,
   buyTicketsForCash: buyTicketsForCash,
+  changeTicketStatus: changeTicketStatus,
 };

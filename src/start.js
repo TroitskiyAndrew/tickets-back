@@ -83,6 +83,7 @@ app.get("/qr/:ticketId", ticketsController.getQR);
 app.post("/tickets", upload.single('image'), ticketsController.buyTickets);
 app.get("/tickets", ticketsController.getTickets);
 app.get("/ticket/:ticketId", ticketsController.getTicket);
+app.put("/ticket", ticketsController.changeTicketStatus);
 app.post("/cities", usersController.saveVisitToCity);
 app.get("/users/:userId", usersController.getUser);
 app.post("/users", usersController.saveSource);
