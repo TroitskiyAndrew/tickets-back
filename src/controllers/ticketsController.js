@@ -54,7 +54,7 @@ const buyTickets = async (req, res) => {
       ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
     };
     const source = dbUser?.source || '';
-    form.append('caption', `Оплата от ${userLink} за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${source ? '. От ' + source : ''}`);
+    form.append('caption', `Оплата от ${userLink} за билеты:\n ${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\nОт ' + source : ''}`);
     form.append('reply_markup', JSON.stringify({
       inline_keyboard: [
         [{ text: "Подтвердить", callback_data: `CONFIRM_SPLIT_${bookingId}` }],
@@ -112,11 +112,13 @@ const buyTicketsForCash = async (req, res) => {
       ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
     };
     const source = newTickets[0]?.source || '';
-    const info = `Купили за билеты: ${ticketStrings.join(', ')}. На общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${source ? '. От ' + source : ''}`
+    const userLink = `<a href="tg://user?id=${dbUser?.user?.id}">${dbUser?.user?.first_name || 'Пользователь'}</a>`;
+    const info = `${userLink} купил:\n ${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\nОт ' + source : ''}`
     for (const notify of config.salesNotifications) {
       await axios.post(`${config.tgApiUrl}/sendMessage`, {
         chat_id: notify,
         text: info,
+        parse_mode: 'HTML',
       });
     }
     res.status(200).send(newTickets);
