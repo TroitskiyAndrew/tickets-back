@@ -38,7 +38,7 @@ const buyTickets = async (req, res) => {
       combo: ticket.combo,
       source: dbUser.source,
       sent: false,
-      _created: utils.getDate(Date.now()),
+      _created: utils.getDate(Date.now() + 7*60*60*100),
       checked: false
     }));
     await dataService.createDocuments('ticket', newTickets);
@@ -99,7 +99,7 @@ const buyTicketsForCash = async (req, res) => {
       combo: ticket.combo,
       source: dbUser.source,
       sent: false,
-      _created: utils.getDate(Date.now()),
+      _created: utils.getDate(Date.now() + 7*60*60*100),
       checked,
     }));
     await dataService.createDocuments('ticket', newTickets);
