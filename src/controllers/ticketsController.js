@@ -40,6 +40,7 @@ const buyTickets = async (req, res) => {
       source: dbUser.source,
       sent: false,
       _created: utils.getDate(Date.now() + 7*60*60*100),
+      discount: ticket.discount,
       checked: false
     }));
     await dataService.createDocuments('ticket', newTickets);
@@ -103,6 +104,7 @@ const sellTickets = async (req, res) => {
       source: `${[dbCashierUser.first_name, dbCashierUser.last_name].filter(Boolean).join(' ')}${dbCashierUser.username ? "(" + dbCashierUser.username + ")" : ""}`,
       sent: false,
       _created: utils.getDate(Date.now() + 7*60*60*100),
+      discount: ticket.discount,
       checked,
     }));
     await dataService.createDocuments('ticket', newTickets);
