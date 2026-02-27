@@ -125,6 +125,8 @@ const sendMessage = async (req, res) => {
     // }
     // console.log('success', success.length)
     // console.log('fail', fail.length)
+
+    // await ticketsService.sendTickets({bookingId: 'OQUo6-HWAjPN-g'})
     res.status(200).send(true);
     return;
   } catch (error) {
