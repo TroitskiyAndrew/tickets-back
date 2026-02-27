@@ -76,14 +76,16 @@ const buyTickets = async (req, res) => {
   }
 };
 
-const buyTicketsForCash = async (req, res) => {
+const sellTickets = async (req, res) => {
   try {
-    const { currency, tickets, userId, cashier, checked, sendTo } = req.body;
+    const { currency, tickets, userId, cashier, checked, sendTo, method } = req.body;
     const { user } = req.telegramData;
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
+    const dbCashier = (await dataService.getDocumentByQuery('user', {userId: cashier})) || {user: {}};
+    const dbCashierUser = dbCashier.user;
     const bookingId = crypto.randomBytes(10).toString('base64url');
     const dbUser = await dataService.getDocumentByQuery('user', { userId })
     const newTickets = tickets.map(ticket => ({
@@ -92,13 +94,13 @@ const buyTicketsForCash = async (req, res) => {
       bookingId,
       type: ticket.type,
       currency,
-      method: 'cash',
+      method,
       price: ticket.price,
-      cashier,
+      cashier: method === 'cash' ? cashier : config.cashier,
       confirmed: true,
       add: ticket.add,
       combo: ticket.combo,
-      source: dbUser.source,
+      source: `${[dbCashierUser.first_name, dbCashierUser.last_name].filter(Boolean).join(' ')}${dbCashierUser.username ? "(" + dbCashierUser.username + ")" : ""}`,
       sent: false,
       _created: utils.getDate(Date.now() + 7*60*60*100),
       checked,
@@ -270,6 +272,6 @@ module.exports = {
   getTicket: getTicket,
   getQR: getQR,
   getSoldTickets: getSoldTickets,
-  buyTicketsForCash: buyTicketsForCash,
+  sellTickets: sellTickets,
   changeTicketStatus: changeTicketStatus,
 };

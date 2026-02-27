@@ -90,7 +90,7 @@ app.post("/users", usersController.saveSource);
 app.get("/event/:eventId", eventsController.getEvent);
 app.get("/sales/:eventId", ticketsController.getSoldTickets);
 app.get("/find/:query", usersController.findUsers);
-app.post("/cash", ticketsController.buyTicketsForCash);
+app.post("/sell", ticketsController.sellTickets);
 app.post("/message", usersController.sendMessage);
 // app.post("/users", usersController.createUser);
 // app.put("/users", usersController.updateUser);
