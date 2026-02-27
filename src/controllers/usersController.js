@@ -69,7 +69,69 @@ const sendMessage = async (req, res) => {
     //   parse_mode: 'HTML',
     //   text: `Сообщение от ${userLink}`,
     // });
-    await dataService.updateDocuments('event', {}, {$set: {entrance: [480144364,692369447,140779820]}})
+    // await dataService.updateDocuments('event', {}, {$set: {entrance: [480144364,692369447,140779820]}})
+    // const users = await dataService.aggregate('user', [
+    //   {
+    //     $lookup: {
+    //       from: "ticket",
+    //       let: { userId: "$userId" },
+    //       pipeline: [
+    //         {
+    //           $match: {
+    //             $expr: {
+    //               $eq: ["$userId", "$$userId"]
+    //             }
+    //           }
+    //         },
+    //         { $limit: 1 }
+    //       ],
+    //       as: "tickets"
+    //     }
+    //   },
+    //   {
+    //     $match: {
+    //       $and: [
+    //         { tickets: { $size: 0 } },   // нет билетов
+    //         {
+    //           $or: [                  // пустой массив
+    //             { visits: "6984917c43c748577e5f8700" }        // содержит значение
+    //           ]
+    //         }
+    //       ]
+    //     }
+    //   }
+    // ])
+    // const ids = users.map(user => user.userId).filter(id => id !== 140779820);
+    // // console.log('ids', ids)
+    // const success = [];
+    // const fail = [];
+    // for (const id of ids) {
+    //   try {
+    //     await axios.post(`${config.tgApiUrl}/sendPhoto`, {
+    //       chat_id: id,
+    //       photo: 'https://www.dropbox.com/scl/fi/pfxe9l923hal1imq5lhq9/what.jpg?rlkey=9vk13epfpfnont2jcjq90z8oi&raw=1',
+    //       parse_mode: 'HTML',
+    //       caption: 'Чего ты ждешь? Концерт уже сегодня и в 18:00 мы поднимем цены на оставшиеся(если еще будут) билеты',
+    //       reply_markup: {
+    //         inline_keyboard: [
+    //           [
+    //             { text: "Билеты на сегодня, 20:00", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_RECALL-2_SEP_EVENT_SPLIT_6985e0b43677bfc5bc8757bb' },
+    //           ],
+    //           [
+    //             { text: "01.03 19:00 Шоу-ипровизация", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_RECALL-2_SEP_EVENT_SPLIT_6985e0b43677bfc5bc8757bc' },
+    //           ]
+    //         ]
+    //       },
+    //     });
+    //     console.log('sent to ', id)
+    //     success.push(id)
+
+    //   } catch (error) {
+    //     fail.push(id)
+    //   }
+    // }
+    // console.log('success', success.length)
+    // console.log('fail', fail.length)
     res.status(200).send(true);
     return;
   } catch (error) {
