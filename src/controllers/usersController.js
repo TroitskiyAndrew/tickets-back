@@ -83,38 +83,38 @@ const sendMessage = async (req, res) => {
     //             $expr: {
     //               $and: [
     //                 { $eq: ["$userId", "$$userId"] },
-    //                 { $eq: ["$event", "6985e0b43677bfc5bc8757bb"] }
+    //                 { $eq: ["$event", "6985e0b43677bfc5bc8757bc"] }
     //               ]
     //             }
     //           }
-    //         }
+    //         },
+    //         { $limit: 1 } // достаточно одного билета
     //       ],
-    //       as: "tickets"
+    //       as: "matchedTickets"
     //     }
     //   },
     //   {
     //     $match: {
-    //       tickets: { $ne: [] }
+    //       matchedTickets: { $ne: [] }
     //     }
     //   },
     //   {
     //     $project: {
-    //       tickets: 0
+    //       matchedTickets: 0
     //     }
     //   }
     // ])
     // const ids = users.map(user => user.userId).filter(id => id !== 140779820);
-    // console.log('ids', ids)
+    // console.log('ids', ids.length)
     // const success = [];
     // const fail = [];
-    // const mapLink = `<a href="https://maps.app.goo.gl/of2sGuRz7NtCJRKG9">TUI BLUE</a>`;
+    // const mapLink = `<a href="https://www.instagram.com/sverlovsk">@sverlovsk</a>`;
     // for (const id of ids) {
     //   try {
     //     await axios.post(`${config.tgApiUrl}/sendMessage`, {
     //       chat_id: id,
     //       parse_mode: 'HTML',
-    //       text: `Ждем тебя сегодня на Стендап-Концерте Дмитрия Сверлова\nНапоминаем, что он пройдет в ${mapLink}, этаж M\nСбор гостей и фуршет назначены на 20:00\nШоу начнется в 20:30`,
-
+    //       text: `Ну что, как тебе сегодняшнее шоу? Кайфанули?\nОтмечайте ${mapLink} в сторис, он обязательно зарепостит!\nОтзыв можно отправить сообщением в чат, Дима все прочитает`,
     //     });
     //     console.log('sent to ', id)
     //     success.push(id)
