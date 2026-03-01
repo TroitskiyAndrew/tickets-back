@@ -12,7 +12,7 @@ async function saveVisit(user, options) {
     let save = false;
     let dbUser = await dataService.getDocumentByQuery('user', { userId })
     if (!dbUser?.userId) {
-        dbUser = await dataService.createDocument('user', { user, userId, pressedStart: false, visits: [], _created: utils.getDate(Date.now() + 7*60*60*100) })
+        dbUser = await dataService.createDocument('user', { user, userId, pressedStart: false, visits: [], _created: utils.getDate(Date.now() + 7*60*60*1000) })
     }
     if(!dbUser.visits){
         dbUser.visits = dbUser.visits;
@@ -39,7 +39,7 @@ async function saveSource(user, source) {
     let save = false;
     let dbUser = await dataService.getDocumentByQuery('user', { userId })
     if (!dbUser?.userId) {
-        dbUser = await dataService.createDocument('user', { user, userId, pressedStart: false, visits: [], source, _created: utils.getDate(Date.now() + 7*60*60*100) })
+        dbUser = await dataService.createDocument('user', { user, userId, pressedStart: false, visits: [], source, _created: utils.getDate(Date.now() + 7*60*60*1000) })
     }
     if (source) {
         save = true;
