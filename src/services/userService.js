@@ -15,12 +15,13 @@ async function handleUser(user, options) {
         }
         if (sessionId) {
             const userBySession = await dataService.getDocumentByQuery('user', { sessionId });
+            console.log(userBySession)
             if (userBySession?.sessionId) {
                 save = true;
                 dbUser.source = userBySession;
                 dbUser.sessionId = sessionId;
                 dbUser.path = [...userBySession.path, ...dbUser.path];
-                await dataService.deleteDocumentByQuery('user', { sessionId });
+                await dataService.deleteDocumentByQuery('user', { sessionId, userId: 0 });
             }
         }
     } else if(sessionId) {

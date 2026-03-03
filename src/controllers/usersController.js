@@ -24,7 +24,7 @@ const saveVisitToCity = async (req, res) => {
   try {
     const { city, sessionId, event } = req.body;
     const { user } = req.telegramData;
-    console.log('saveVisitToCity', 'sessionId', req.body.sessionId)
+    // console.log('saveVisitToCity', 'sessionId', req.body.sessionId)
     await userService.handleUser(user, { city, sessionId, event });
     res.status(200).send(true);
     return;
