@@ -34,7 +34,6 @@ const telegramInitDataMiddleware = async (req, res, next) => {
     if (!config.prod) {
       // ToDo для локального тестирования
       req.telegramData = { }
-      // console.log('!config.prod', 'sessionId', req.body.sessionId)
       await userService.handleUser(null, {sessionId: req.body.sessionId})
       next();
       return;
@@ -45,7 +44,6 @@ const telegramInitDataMiddleware = async (req, res, next) => {
     if (!raw) {
       req.telegramData = {}
       await userService.handleUser(null, {sessionId: req.body.sessionId})
-      console.log('!raw', 'sessionId', req.body.sessionId)
       next();
     } else {
       const isInitDataValid = isValid(
@@ -62,7 +60,6 @@ const telegramInitDataMiddleware = async (req, res, next) => {
         return result;
       } , {}) 
       req.telegramData = telegramData;
-      console.log('raw', 'sessionId', req.body.sessionId)
       await userService.handleUser(telegramData.user, {sessionId: req.body.sessionId})
       next();
     }

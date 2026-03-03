@@ -39,7 +39,6 @@ const saveSource = async (req, res) => {
   try {
     const { source, sessionId } = req.body;
     const { user } = req.telegramData;
-    console.log('saveSource', 'sessionId', req.body.sessionId)
     await userService.handleUser(user, {source, sessionId})
     res.status(200).send(true);
     return;

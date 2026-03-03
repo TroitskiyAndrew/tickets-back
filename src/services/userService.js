@@ -11,11 +11,8 @@ async function handleUser(user, options) {
     if (user) {
         const userId = user.id;
         dbUser = await dataService.getDocumentByQuery('user', { userId });
-        if (!dbUser?.userId) {
-            
-            console.log('hasUser',userId, dbUser == null)
+        if (!dbUser && sessionId) {
             dbUser = await dataService.createDocument('user', { user, userId, pressedStart: false, visits: [], path: [], source: source || '', sessionId, _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000) })
-            console.log('finishCreationg ',userId , dbUser == null)
         }
         if (sessionId) {
             const userBySession = await dataService.getDocumentByQuery('user', { sessionId, userId: 0 });
@@ -25,12 +22,12 @@ async function handleUser(user, options) {
                 dbUser.source = userBySession.source;
                 dbUser.sessionId = sessionId;
                 dbUser.path = [...dbUser.path, ...userBySession.path];
-                await dataService.deleteDocumentByQuery('user', { sessionId, userId: 0 });
+                await dataService.deleteDocumentsByQuery('user', { sessionId, userId: 0 });
             }
         }
     } else if(sessionId) {
         dbUser = await dataService.getDocumentByQuery('user', { sessionId, userId: 0 });
-        if (!dbUser?.sessionId) {
+        if (!dbUser) {
             console.log('hasSessionId',sessionId, dbUser)
             dbUser = await dataService.createDocument('user', { user: {}, userId: 0, pressedStart: false, visits: [], path: [], source: source || '', sessionId, _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000) })
         }
