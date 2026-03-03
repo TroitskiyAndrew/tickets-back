@@ -18,7 +18,7 @@ async function handleUser(user, options) {
             console.log(userBySession)
             if (userBySession?.sessionId) {
                 save = true;
-                dbUser.source = userBySession;
+                dbUser.source = userBySession.source;
                 dbUser.sessionId = sessionId;
                 dbUser.path = [...userBySession.path, ...dbUser.path];
                 await dataService.deleteDocumentByQuery('user', { sessionId, userId: 0 });
