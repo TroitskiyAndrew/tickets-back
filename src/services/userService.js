@@ -12,9 +12,9 @@ async function handleUser(user, options) {
         dbUser = await dataService.getDocumentByQuery('user', { userId });
         if (!dbUser?.userId) {
             
-            console.log('hasUser',userId, dbUser)
+            console.log('hasUser',userId, dbUser == null)
             dbUser = await dataService.createDocument('user', { user, userId, pressedStart: false, visits: [], path: [], source: source || '', sessionId, _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000) })
-            console.log('finishCreationg ',userId , dbUser)
+            console.log('finishCreationg ',userId , dbUser == null)
         }
         if (sessionId) {
             const userBySession = await dataService.getDocumentByQuery('user', { sessionId, userId: 0 });
@@ -23,7 +23,7 @@ async function handleUser(user, options) {
                 save = true;
                 dbUser.source = userBySession.source;
                 dbUser.sessionId = sessionId;
-                dbUser.path = [...userBySession.path, ...dbUser.path];
+                dbUser.path = [...dbUser.path, ...userBySession.path];
                 await dataService.deleteDocumentByQuery('user', { sessionId, userId: 0 });
             }
         }
