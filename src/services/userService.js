@@ -11,6 +11,7 @@ async function handleUser(user, options) {
         const userId = user.id;
         dbUser = await dataService.getDocumentByQuery('user', { userId });
         if (!dbUser?.userId) {
+            console.log('hasUser',user, dbUser)
             dbUser = await dataService.createDocument('user', { user, userId, pressedStart: false, visits: [], path: [], source: source || '', sessionId, _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000) })
         }
         if (sessionId) {
@@ -27,6 +28,7 @@ async function handleUser(user, options) {
     } else if(sessionId) {
         dbUser = await dataService.getDocumentByQuery('user', { sessionId });
         if (!dbUser?.sessionId) {
+            console.log('hasSessionId',sessionId, dbUser)
             dbUser = await dataService.createDocument('user', { user: {}, userId: 0, pressedStart: false, visits: [], path: [], source: source || '', sessionId, _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000) })
         }
     }
