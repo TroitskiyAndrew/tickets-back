@@ -23,7 +23,7 @@ const buyTickets = async (req, res) => {
       return;
     }
     const bookingId = crypto.randomBytes(10).toString('base64url');
-    const tickets = JSON.parse(ticketsString);
+    const tickets =ticketsString ? JSON.parse(ticketsString) : [];
     const dbUser = await dataService.getDocumentByQuery('user', { userId: user.id })
     const newTickets = tickets.map(ticket => ({
       userId: user.id,
