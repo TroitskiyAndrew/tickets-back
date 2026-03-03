@@ -33,7 +33,7 @@ const telegramInitDataMiddleware = async (req, res, next) => {
     //   return;
     if (!config.prod) {
       // ToDo для локального тестирования
-      req.telegramData = { }
+      req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
       await userService.handleUser(null, {sessionId: req.body.sessionId})
       next();
       return;
@@ -83,6 +83,7 @@ app.get("/places", placeController.getPlaces);
 app.get("/qr/:ticketId", ticketsController.getQR);
 app.post("/tickets", upload.single('image'), ticketsController.buyTickets);
 app.get("/tickets", ticketsController.getTickets);
+app.get("/booking/:bookingId", ticketsController.getTicketsByBooking);
 app.get("/ticket/:ticketId", ticketsController.getTicket);
 app.put("/ticket", ticketsController.changeTicketStatus);
 app.post("/cities", usersController.saveVisitToCity);
