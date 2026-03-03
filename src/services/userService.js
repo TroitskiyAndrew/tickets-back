@@ -3,6 +3,7 @@ const dataService = require("./mongodb");
 const utils = require("../services/utils");
 
 async function handleUser(user, options) {
+    try {
     const { city, pressedStart, source, sessionId, event } = options;
    // console.log('handleUser', user, source, sessionId)
     let dbUser;
@@ -59,6 +60,9 @@ async function handleUser(user, options) {
     if (save) {
         await dataService.updateDocument('user', dbUser);
     }
+    } catch(error) {
+        console.log(error)
+    } 
 }
 
 async function findUsers(query = '') {
