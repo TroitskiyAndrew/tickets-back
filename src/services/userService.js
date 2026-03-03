@@ -2,48 +2,54 @@
 const dataService = require("./mongodb");
 const utils = require("../services/utils");
 
-async function saveVisit(user, options) {
-    const { city, pressedStart } = options;
-    if (!user) {
-        console.log('__Не было юзера__')
-        return;
-    }
-    const userId = user.id;
+async function handleUser(user, options) {
+    const { city, pressedStart, source, sessionId, event } = options;
+    console.log('handleUser', user, source, sessionId)
+    let dbUser;
     let save = false;
-    let dbUser = await dataService.getDocumentByQuery('user', { userId })
-    if (!dbUser?.userId) {
-        dbUser = await dataService.createDocument('user', { user, userId, pressedStart: false, visits: [], path: [], _created: utils.getDate(Date.now() + 7*60*60*1000) })
+    if (user) {
+        const userId = user.id;
+        dbUser = await dataService.getDocumentByQuery('user', { userId });
+        if (!dbUser?.userId) {
+            dbUser = await dataService.createDocument('user', { user, userId, pressedStart: false, visits: [], path: [], source: source || '', sessionId, _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000) })
+        }
+        if (sessionId) {
+            const userBySession = await dataService.getDocumentByQuery('user', { sessionId });
+            if (userBySession?.sessionId) {
+                save = true;
+                dbUser.source = userBySession;
+                dbUser.sessionId = sessionId;
+                dbUser.path = [...userBySession.path, ...dbUser.path];
+                await dataService.deleteDocumentByQuery('user', { sessionId });
+            }
+        }
+    } else if(sessionId) {
+        dbUser = await dataService.getDocumentByQuery('user', { sessionId });
+        if (!dbUser?.sessionId) {
+            dbUser = await dataService.createDocument('user', { user: {}, userId: 0, pressedStart: false, visits: [], path: [], source: source || '', sessionId, _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000) })
+        }
     }
-    if(!dbUser.visits){
-        dbUser.visits = dbUser.visits;
+    if (source) {
+        save = true;
+        dbUser.path.push(source);
+        if (!dbUser.source){
+            dbUser.source = source
+        }
     }
     if (city && !dbUser.visits.includes(city)) {
         save = true;
         dbUser.visits.push(city)
     }
+    if(event){
+        const lastPoint = dbUser.path[dbUser.path.length -1];
+        save = true;
+        if(event !== lastPoint){
+            dbUser.path.push(event);
+        }
+    }
     if (pressedStart && !dbUser.pressedStart) {
         save = true;
         dbUser.pressedStart = true;
-    }
-    if (save) {
-        await dataService.updateDocument('user', dbUser);
-    }
-}
-
-async function saveSource(user, source) {
-    if (!user) {
-        console.log('__Не было юзера__')
-        return;
-    }
-    const userId = user.id;
-    let save = false;
-    let dbUser = await dataService.getDocumentByQuery('user', { userId })
-    if (!dbUser?.userId) {
-        dbUser = await dataService.createDocument('user', { user, userId, pressedStart: false, visits: [], path: [], source, _created: utils.getDate(Date.now() + 7*60*60*1000) })
-    }
-    if (source) {
-        save = true;
-        dbUser.source = source;
     }
     if (save) {
         await dataService.updateDocument('user', dbUser);
@@ -58,11 +64,11 @@ async function findUsers(query = '') {
             { "user.username": { $regex: query, $options: "i" } }
         ]
     });
-    
+
     return (users || []).map(user => {
         const hasName = user.user.first_name || user.user.last_name;
         let name = hasName ? [user.user.first_name, user.user.last_name].filter(Boolean).join(' ') : '';
-        if(user.user.username) {
+        if (user.user.username) {
             name += name ? '(' + user.user.username + ')' : user.user.username;
         }
         return {
@@ -74,7 +80,6 @@ async function findUsers(query = '') {
 
 
 module.exports = {
-    saveVisit: saveVisit,
-    saveSource: saveSource,
+    handleUser: handleUser,
     findUsers: findUsers,
 };

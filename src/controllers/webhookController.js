@@ -166,7 +166,8 @@ const handleWebhook = async (req, res) => {
         const now = Date.now();
         console.log('start', now)
         try {
-          await userService.saveVisit(message.from, { pressedStart: true });
+          console.log('startMessage', 'sessionId', 'null')
+          await userService.handleUser(message.from, { pressedStart: true });
           await ticketsService.sendTickets({ userId: message.from.id }, { marketing: true });
           await axios.post(`${config.tgApiUrl}/sendPhoto`, {
             chat_id: message.chat.id,

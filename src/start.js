@@ -33,9 +33,10 @@ const telegramInitDataMiddleware = async (req, res, next) => {
     //   return;
     if (!config.prod) {
       // ToDo для локального тестирования
-      req.telegramData = { user: { id: 111, first_name: 'Тестовый юзер' }, chat: null, params: {} }
+      req.telegramData = { }
+      console.log('!config.prod', 'sessionId', req.body.sessionId)
+      await userService.handleUser(null, {sessionId: req.body.sessionId})
       next();
-      await userService.saveVisit(req.telegramData.user, {})
       return;
     }
 
@@ -43,8 +44,10 @@ const telegramInitDataMiddleware = async (req, res, next) => {
     const raw = (req.get(config.telegrammHeader) || req.body?.initData || '').toString();
     if (!raw) {
       req.telegramData = {}
+      await userService.handleUser(null, {sessionId: req.body.sessionId})
+      console.log('!raw', 'sessionId', req.body.sessionId)
       next();
-    } else{
+    } else {
       const isInitDataValid = isValid(
         raw,
         config.botToken,
@@ -59,7 +62,8 @@ const telegramInitDataMiddleware = async (req, res, next) => {
         return result;
       } , {}) 
       req.telegramData = telegramData;
-      await userService.saveVisit(telegramData.user, {})
+      console.log('raw', 'sessionId', req.body.sessionId)
+      await userService.handleUser(telegramData.user, {sessionId: req.body.sessionId})
       next();
     }
 

@@ -22,9 +22,10 @@ const getUser = async (req, res) => {
 
 const saveVisitToCity = async (req, res) => {
   try {
-    const { city } = req.body;
+    const { city, sessionId, event } = req.body;
     const { user } = req.telegramData;
-    await userService.saveVisit(user, { city })
+    console.log('saveVisitToCity', 'sessionId', req.body.sessionId)
+    await userService.handleUser(user, { city, sessionId, event });
     res.status(200).send(true);
     return;
   } catch (error) {
@@ -36,9 +37,10 @@ const saveVisitToCity = async (req, res) => {
 
 const saveSource = async (req, res) => {
   try {
-    const { source } = req.body;
+    const { source, sessionId } = req.body;
     const { user } = req.telegramData;
-    await userService.saveSource(user, source)
+    console.log('saveSource', 'sessionId', req.body.sessionId)
+    await userService.handleUser(user, {source, sessionId})
     res.status(200).send(true);
     return;
   } catch (error) {
@@ -127,6 +129,7 @@ const sendMessage = async (req, res) => {
     // console.log('fail', fail.length)
 
     // await ticketsService.sendTickets({bookingId: 'OQUo6-HWAjPN-g'})
+    // await dataService.updateDocuments('user', {}, {$set: {sessionId: 'OldUser'}});
     res.status(200).send(true);
     return;
   } catch (error) {
