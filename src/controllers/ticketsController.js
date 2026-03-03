@@ -47,7 +47,11 @@ const buyTickets = async (req, res) => {
     const form = new FormData();
     form.append('chat_id', config.cashier);
     form.append('parse_mode', 'HTML');
-    form.append('photo', fs.createReadStream(req.file.path));
+    if(req.file){
+      form.append('photo', fs.createReadStream(req.file.path));
+    } else {
+      form.append('photo', 'https://www.dropbox.com/scl/fi/gll6m7uuzwi37cb6379bl/zhdun.jpg?rlkey=xmm48wmk0ri4ckudm5bde23ez&raw=1');
+    }
     const userLink = `<a href="https://t.me/${user.username}">${user.first_name || user.username || 'Пользователь'}</a>`;
     const total = tickets.reduce((acc, ticket) => acc += ticket.price, 0);
     const ticketStrings = []
