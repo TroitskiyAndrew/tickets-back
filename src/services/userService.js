@@ -4,7 +4,7 @@ const utils = require("../services/utils");
 
 async function handleUser(user, options) {
     const { city, pressedStart, source, sessionId, event } = options;
-    console.log('handleUser', user, source, sessionId)
+   // console.log('handleUser', user, source, sessionId)
     let dbUser;
     let save = false;
     if (user) {
