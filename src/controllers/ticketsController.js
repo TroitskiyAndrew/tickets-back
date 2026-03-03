@@ -89,6 +89,7 @@ const sellTickets = async (req, res) => {
     const dbCashierUser = dbCashier.user;
     const bookingId = crypto.randomBytes(10).toString('base64url');
     const dbUser = await dataService.getDocumentByQuery('user', { userId })
+    const fakeUser = userId === 555;
     const newTickets = tickets.map(ticket => ({
       userId,
       event: ticket.eventId,
@@ -101,7 +102,7 @@ const sellTickets = async (req, res) => {
       confirmed: true,
       add: ticket.add,
       combo: ticket.combo,
-      source: `${[dbCashierUser.first_name, dbCashierUser.last_name].filter(Boolean).join(' ')}${dbCashierUser.username ? "(" + dbCashierUser.username + ")" : ""}`,
+      source: fakeUser ? `${[dbCashierUser.first_name, dbCashierUser.last_name].filter(Boolean).join(' ')}${dbCashierUser.username ? "(" + dbCashierUser.username + ")" : ""}` : dbUser.source,
       sent: false,
       _created: utils.getDate(Date.now() + 7*60*60*1000),
       discount: ticket.discount,
