@@ -102,7 +102,7 @@ const sellTickets = async (req, res) => {
       confirmed: true,
       add: ticket.add,
       combo: ticket.combo,
-      source: (fakeUser ? "" : (dbUser?.path ?? [] ).join("-" ) ) + :`${[dbCashierUser.first_name, dbCashierUser.last_name].filter(Boolean).join(' ')}${dbCashierUser.username ? "(" + dbCashierUser.username + ")" : ""}`,
+      source: (fakeUser ? "" : (dbUser?.path ?? [] ).join("-" ) ) + `:${[dbCashierUser.first_name, dbCashierUser.last_name].filter(Boolean).join(' ')}${dbCashierUser.username ? "(" + dbCashierUser.username + ")" : ""}`,
       sent: false,
       _created: utils.getDate(Date.now() + 7*60*60*1000),
       discount: ticket.discount,
