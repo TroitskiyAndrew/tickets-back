@@ -14,7 +14,7 @@ async function handleUser(user, options) {
             dbUser = await dataService.createDocument('user', { user, userId, pressedStart: false, visits: [], path: [], source: source || '', sessionId, _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000) })
         }
         if (sessionId) {
-            const userBySession = await dataService.getDocumentByQuery('user', { sessionId });
+            const userBySession = await dataService.getDocumentByQuery('user', { sessionId, userId: 0 });
             console.log(userBySession)
             if (userBySession?.sessionId) {
                 save = true;
