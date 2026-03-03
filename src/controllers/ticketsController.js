@@ -37,7 +37,7 @@ const buyTickets = async (req, res) => {
       confirmed: false,
       add: ticket.add,
       combo: ticket.combo,
-      source: ticket.source || dbUser?.source || '',
+      source: ticket.source || (dbUser?.path ?? []).join('-')|| '',
       sent: false,
       _created: utils.getDate(Date.now() + 7*60*60*1000),
       discount: ticket.discount,
@@ -55,7 +55,7 @@ const buyTickets = async (req, res) => {
       const event = await eventsService.getEventFromCache(ticket.event);
       ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
     };
-    const source = newTickets[0].source || '';
+    const source = dbUser?.source || '';
     form.append('caption', `Оплата от ${userLink} за билеты:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\nОт ' + source : ''}`);
     form.append('reply_markup', JSON.stringify({
       inline_keyboard: [
@@ -102,7 +102,7 @@ const sellTickets = async (req, res) => {
       confirmed: true,
       add: ticket.add,
       combo: ticket.combo,
-      source: fakeUser ? `${[dbCashierUser.first_name, dbCashierUser.last_name].filter(Boolean).join(' ')}${dbCashierUser.username ? "(" + dbCashierUser.username + ")" : ""}` : dbUser.source,
+      source: (fakeUser ? "" : (dbUser?.path ?? [] ).join("-" ) ) + :`${[dbCashierUser.first_name, dbCashierUser.last_name].filter(Boolean).join(' ')}${dbCashierUser.username ? "(" + dbCashierUser.username + ")" : ""}`,
       sent: false,
       _created: utils.getDate(Date.now() + 7*60*60*1000),
       discount: ticket.discount,
