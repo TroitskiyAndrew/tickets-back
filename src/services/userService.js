@@ -22,7 +22,7 @@ async function handleUser(user, options) {
             console.log(userBySession)
             if (userBySession?.sessionId) {
                 save = true;
-                dbUser.source = userBySession.source;
+                dbUser.source = userBySession.source || dbUser.source;
                 dbUser.sessionId = sessionId;
                 dbUser.path = [...dbUser.path, ...userBySession.path];
                 await dataService.deleteDocumentsByQuery('user', { sessionId, userId: 0 });
@@ -37,7 +37,10 @@ async function handleUser(user, options) {
     }
     if (source) {
         save = true;
-        dbUser.path.push(source);
+        const lastPoint = dbUser.path[dbUser.path.length -1];
+        if(source !== lastPoint){
+            dbUser.path.push(source);
+        }
         if (!dbUser.source){
             dbUser.source = source
         }
