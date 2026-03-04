@@ -94,10 +94,12 @@ const handleWebhook = async (req, res) => {
           }
           case 'WRONG': {
             const tickets = await dataService.getDocuments('ticket', { bookingId: value });
-            await axios.post(`${config.tgApiUrl}/sendMessage`, {
-              chat_id: tickets[0].userId,
-              text: "Что-то не сошлось по сумме. Напишите сообщение, чтобы уточнить детали",
-            });
+            if(tickets.length){
+              await axios.post(`${config.tgApiUrl}/sendMessage`, {
+                chat_id: tickets[0].userId,
+                text: "Что-то не сошлось по сумме. Напишите сообщение, чтобы уточнить детали",
+              });
+            }
             break;
           }
           case 'DROP': {
