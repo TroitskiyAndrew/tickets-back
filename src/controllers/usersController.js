@@ -39,7 +39,7 @@ const saveSource = async (req, res) => {
   try {
     const { source, sessionId } = req.body;
     const { user } = req.telegramData;
-    await userService.handleUser(user, {source, sessionId})
+    await userService.handleUser(user, { source, sessionId })
     res.status(200).send(true);
     return;
   } catch (error) {
@@ -63,6 +63,7 @@ const findUsers = async (req, res) => {
 
 const sendMessage = async (req, res) => {
   try {
+    const andrei = 480144364
     // const user = { id: 480144364, first_name: 'Test', username:'alevtina_psychologist'  };
     //  const userLink = `<a href="https://t.me/${user.username}">${user.first_name || user.username || 'Пользователь'}</a>`;
     // await axios.post(`${config.tgApiUrl}/sendMessage`, {
@@ -84,7 +85,15 @@ const sendMessage = async (req, res) => {
     //             $expr: {
     //               $and: [
     //                 { $eq: ["$userId", "$$userId"] },
-    //                 { $eq: ["$event", "6985e0b43677bfc5bc8757bc"] }
+    //                 {
+    //                   $in: [
+    //                     "$event",
+    //                     [
+    //                       "6985e0b63677bfc5bc8757c3",
+    //                       "6985e0b63677bfc5bc8757c4"
+    //                     ]
+    //                   ]
+    //                 }
     //               ]
     //             }
     //           }
@@ -112,23 +121,117 @@ const sendMessage = async (req, res) => {
     // const mapLink = `<a href="https://www.instagram.com/sverlovsk">@sverlovsk</a>`;
     // for (const id of ids) {
     //   try {
-    //     await axios.post(`${config.tgApiUrl}/sendMessage`, {
+    //     await axios.post(`${config.tgApiUrl}/sendPhoto`, {
     //       chat_id: id,
     //       parse_mode: 'HTML',
-    //       text: `Ну что, как тебе сегодняшнее шоу? Кайфанули?\nОтмечайте ${mapLink} в сторис, он обязательно зарепостит!\nОтзыв можно отправить сообщением в чат, Дима все прочитает`,
+    //       photo: 'https://www.dropbox.com/scl/fi/pfxe9l923hal1imq5lhq9/what.jpg?rlkey=9vk13epfpfnont2jcjq90z8oi&raw=1',
+    //       caption: `Я к тебе с хорошей новостью. Мы снизили цены на билеты\nЕсли хочешь - вернем тебе часть денег или оформим депозит на баре 😉\nПлюс, персональная скидка 30% на второе шоу\nнапиши в чат с ботом, чтобы связаться с нами`,
+    //       reply_markup: {
+    //         inline_keyboard: [
+    //           [
+    //             { text: "Новые цены на Стендап-концерт 06.03 20:00", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_PRICE-LOW-NOTICE_SEP_EVENT_SPLIT_6985e0b63677bfc5bc8757c3' },
+    //           ],
+    //           [
+    //             { text: "Новые цены на Шоу-Импровизация 08.03 20:00", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_PRICE-LOW-NOTICE_SEP_EVENT_SPLIT_6985e0b63677bfc5bc8757c4' },
+    //           ]
+    //         ]
+    //       },
     //     });
     //     console.log('sent to ', id)
     //     success.push(id)
 
     //   } catch (error) {
+    //     console.log(error)
     //     fail.push(id)
     //   }
     // }
-    // console.log('success', success.length)
-    // console.log('fail', fail.length)
+
+//     const users = await dataService.aggregate('user', [
+//   {
+//     // 1️⃣ Сначала отфильтруем по visits (использует индекс)
+//     $match: {
+//       visits: "6984920343c748577e5f8704"
+//     }
+//   },
+//   {
+//     // 2️⃣ Проверяем отсутствие нужных билетов
+//     $lookup: {
+//       from: "ticket",
+//       let: { userId: "$userId" },
+//       pipeline: [
+//         {
+//           $match: {
+//             $expr: {
+//               $and: [
+//                 { $eq: ["$userId", "$$userId"] },
+//                 {
+//                   $in: [
+//                     "$event",
+//                     [
+//                       "6985e0b63677bfc5bc8757c3",
+//                       "6985e0b63677bfc5bc8757c4"
+//                     ]
+//                   ]
+//                 }
+//               ]
+//             }
+//           }
+//         },
+//         { $limit: 1 } // достаточно одного совпадения
+//       ],
+//       as: "matchedTickets"
+//     }
+//   },
+//   {
+//     // 3️⃣ Оставляем только тех, у кого таких билетов нет
+//     $match: {
+//       matchedTickets: { $eq: [] }
+//     }
+//   },
+//   {
+//     $project: {
+//       matchedTickets: 0
+//     }
+//   }
+// ])
+//     const ids = users.map(user => user.userId).filter(id => id !== 140779820);
+//     console.log('ids', ids.length)
+//     const success = [];
+//     const fail = [];
+//     const mapLink = `<a href="https://www.instagram.com/sverlovsk">@sverlovsk</a>`;
+//     for (const id of ids) {
+//       try {
+//         await axios.post(`${config.tgApiUrl}/sendPhoto`, {
+//           chat_id: id,
+//           parse_mode: 'HTML',
+//           photo: 'https://www.dropbox.com/scl/fi/pfxe9l923hal1imq5lhq9/what.jpg?rlkey=9vk13epfpfnont2jcjq90z8oi&raw=1',
+//           caption: `Я к тебе с хорошей новостью - цены на билеты в Муйне снизились\nУспевай купить, пока не разобрали`,
+//           reply_markup: {
+//             inline_keyboard: [
+//               [
+//                 { text: "Новые цены на Стендап-концерт 06.03 20:00", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_PRICE-LOW-NOTICE_SEP_EVENT_SPLIT_6985e0b63677bfc5bc8757c3' },
+//               ],
+//               [
+//                 { text: "Новые цены на Шоу-Импровизация 08.03 20:00", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_PRICE-LOW-NOTICE_SEP_EVENT_SPLIT_6985e0b63677bfc5bc8757c4' },
+//               ]
+//             ]
+//           },
+//         });
+//         console.log('sent to ', id)
+//         success.push(id)
+
+//       } catch (error) {
+//         console.log(error)
+//         fail.push(id)
+//       }
+//     }
+//     console.log('success', success.length)
+//     console.log('fail', fail.length)
 
     // await ticketsService.sendTickets({bookingId: 'OQUo6-HWAjPN-g'})
     // await dataService.updateDocuments('user', {}, {$set: {sessionId: 'OldUser'}});
+
+
     res.status(200).send(true);
     return;
   } catch (error) {
