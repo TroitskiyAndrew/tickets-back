@@ -23,7 +23,7 @@ const buyTickets = async (req, res) => {
       return;
     }
     const bookingId = crypto.randomBytes(10).toString('base64url');
-    const tickets =ticketsString ? JSON.parse(ticketsString) : [];
+    const tickets = ticketsString ? JSON.parse(ticketsString) : [];
     const dbUser = await dataService.getDocumentByQuery('user', { userId: user.id })
     const newTickets = tickets.map(ticket => ({
       userId: user.id,
@@ -37,9 +37,9 @@ const buyTickets = async (req, res) => {
       confirmed: false,
       add: ticket.add,
       combo: ticket.combo,
-      source: ticket.source || (dbUser?.path ?? []).join('-')|| '',
+      source: ticket.source || (dbUser?.path ?? []).join('-') || '',
       sent: false,
-      _created: utils.getDate(Date.now() + 7*60*60*1000),
+      _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000),
       discount: ticket.discount,
       checked: false
     }));
@@ -47,7 +47,7 @@ const buyTickets = async (req, res) => {
     const form = new FormData();
     form.append('chat_id', config.cashier);
     form.append('parse_mode', 'HTML');
-    if(req.file){
+    if (req.file) {
       form.append('photo', fs.createReadStream(req.file.path));
     } else {
       form.append('photo', 'https://www.dropbox.com/scl/fi/gll6m7uuzwi37cb6379bl/zhdun.jpg?rlkey=xmm48wmk0ri4ckudm5bde23ez&raw=1');
@@ -89,7 +89,7 @@ const sellTickets = async (req, res) => {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    const dbCashier = (await dataService.getDocumentByQuery('user', {userId: cashier})) || {user: {}};
+    const dbCashier = (await dataService.getDocumentByQuery('user', { userId: cashier })) || { user: {} };
     const dbCashierUser = dbCashier.user;
     const bookingId = crypto.randomBytes(10).toString('base64url');
     const dbUser = await dataService.getDocumentByQuery('user', { userId })
@@ -106,9 +106,9 @@ const sellTickets = async (req, res) => {
       confirmed: true,
       add: ticket.add,
       combo: ticket.combo,
-      source: (fakeUser ? "" : (dbUser?.path ?? [] ).join("-" ) ) + `:${[dbCashierUser.first_name, dbCashierUser.last_name].filter(Boolean).join(' ')}${dbCashierUser.username ? "(" + dbCashierUser.username + ")" : ""}`,
+      source: (fakeUser ? "" : (dbUser?.path ?? []).join("-")) + `:${[dbCashierUser.first_name, dbCashierUser.last_name].filter(Boolean).join(' ')}${dbCashierUser.username ? "(" + dbCashierUser.username + ")" : ""}`,
       sent: false,
-      _created: utils.getDate(Date.now() + 7*60*60*1000),
+      _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000),
       discount: ticket.discount,
       checked,
     }));
@@ -121,7 +121,7 @@ const sellTickets = async (req, res) => {
       const event = await eventsService.getEventFromCache(ticket.eventId);
       ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
     };
-    const source = newTickets[0]?.source || '';
+    const source = fakeUser ? newTickets[0]?.source : dbUser?.source || '';
     const userLink = `<a href="https://t.me/${dbUser?.user?.username}">${dbUser?.user?.first_name || dbUser?.user?.username || 'Пользователь'}</a>`;
     const info = `${userLink} купил:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\nОт ' + source : ''}`
     for (const notify of config.salesNotifications) {
@@ -268,7 +268,7 @@ const changeTicketStatus = async (req, res) => {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    const {ticketId, inside} = req.body;
+    const { ticketId, inside } = req.body;
     const ticket = await dataService.getDocument('ticket', ticketId);
     if (!ticket) {
       res.status(404).json({ error: 'Not Found' });
@@ -279,8 +279,8 @@ const changeTicketStatus = async (req, res) => {
       res.status(404).json({ error: 'Not Found' });
       return;
     }
-    if((event.entrance || []).includes(user.id)){
-      await dataService.updateDocumentByQuery('ticket', {_id: new ObjectId(ticketId)}, {$set: {checked: inside}})
+    if ((event.entrance || []).includes(user.id)) {
+      await dataService.updateDocumentByQuery('ticket', { _id: new ObjectId(ticketId) }, { $set: { checked: inside } })
       ticket.checked = inside;
       result = true;
     }

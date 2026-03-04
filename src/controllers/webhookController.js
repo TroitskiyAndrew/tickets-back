@@ -64,8 +64,8 @@ const handleWebhook = async (req, res) => {
               const event = await eventsService.getEventFromCache(ticket.event);
               ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
             };
-            const source = tickets[0]?.source || '';
             const dbUser = (await dataService.getDocumentByQuery('user', { userId: tickets[0].userId })) || {};
+            const source = dbUser?.source || '';
             const { user } = dbUser;
             const userLink = `<a href="https://t.me/${user.username}">${user.first_name || user.username || 'Пользователь'}</a>`;
             const info = `${userLink} купил:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\n От ' + source : ''}`
