@@ -4,7 +4,7 @@ const utils = require("../services/utils");
 
 async function handleUser(user, options) {
     try {
-    const { city, pressedStart, source, sessionId, event } = options;
+    const { city, pressedStart, source, sessionId, event, pathPoint } = options;
     let dbUser;
     let save = false;
     if (user) {
@@ -38,8 +38,19 @@ async function handleUser(user, options) {
         if(source !== lastPoint){
             dbUser.path.push(source);
         }
+        const lastSource = dbUser.sources[dbUser.sources.length -1];
+        if(source !== lastSource){
+            dbUser.sources.push(source);
+        }
         if (!dbUser.source){
             dbUser.source = source
+        }
+    }
+    if (pathPoint) {
+        save = true;
+        const lastPoint = dbUser.path[dbUser.path.length -1];
+        if(pathPoint !== lastPoint){
+            dbUser.path.push(pathPoint);
         }
     }
     if (city && !dbUser.visits.includes(city)) {

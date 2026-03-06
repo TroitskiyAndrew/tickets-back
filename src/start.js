@@ -89,6 +89,7 @@ app.put("/ticket", ticketsController.changeTicketStatus);
 app.post("/cities", usersController.saveVisitToCity);
 app.get("/users/:userId", usersController.getUser);
 app.post("/users", usersController.saveSource);
+app.post("/path", usersController.savePath);
 app.get("/event/:eventId", eventsController.getEvent);
 app.get("/sales/:eventId", ticketsController.getSoldTickets);
 app.get("/find/:query", usersController.findUsers);
