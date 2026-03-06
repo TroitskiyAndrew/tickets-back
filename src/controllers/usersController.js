@@ -24,7 +24,6 @@ const saveVisitToCity = async (req, res) => {
   try {
     const { city, sessionId, event } = req.body;
     const { user } = req.telegramData;
-    // console.log('saveVisitToCity', 'sessionId', req.body.sessionId)
     await userService.handleUser(user, { city, sessionId, event });
     res.status(200).send(true);
     return;
@@ -231,7 +230,7 @@ const sendMessage = async (req, res) => {
     // await ticketsService.sendTickets({bookingId: 'OQUo6-HWAjPN-g'})
     // await dataService.updateDocuments('user', {}, {$set: {sessionId: 'OldUser'}});
 
-
+    
     res.status(200).send(true);
     return;
   } catch (error) {

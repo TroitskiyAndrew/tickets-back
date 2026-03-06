@@ -5,7 +5,6 @@ const utils = require("../services/utils");
 async function handleUser(user, options) {
     try {
     const { city, pressedStart, source, sessionId, event } = options;
-   // console.log('handleUser', user, source, sessionId)
     let dbUser;
     let save = false;
     if (user) {
@@ -19,7 +18,6 @@ async function handleUser(user, options) {
         }
         if (sessionId) {
             const userBySession = await dataService.getDocumentByQuery('user', { sessionId, userId: 0 });
-            console.log(userBySession)
             if (userBySession?.sessionId) {
                 save = true;
                 dbUser.source = userBySession.source || dbUser.source;
@@ -31,7 +29,6 @@ async function handleUser(user, options) {
     } else if(sessionId) {
         dbUser = await dataService.getDocumentByQuery('user', { sessionId, userId: 0 });
         if (!dbUser) {
-            console.log('hasSessionId',sessionId, dbUser)
             dbUser = await dataService.createDocument('user', { user: {}, userId: 0, pressedStart: false, visits: [], path: [], source: source || '', sessionId, _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000) })
         }
     }

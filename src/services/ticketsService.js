@@ -14,7 +14,6 @@ async function sendTickets(query, options = {}) {
         const {marketing, sendTo} = options;
         const tickets = await dataService.getDocuments('ticket', {...query, sent: false, confirmed: true});
         if (!tickets.length) {
-            console.log('___No tickets___', query)
             return;
         }
         const congratsText = marketing ? "Билет сейчас упадут в чат, плюс ты всегда сможешь найти их в приложении бота. Увидимся на шоу!" : "Йоу-йоу! Мы получили ваши деньги, все четко. Билеты сейчас упадут в чат, плюс ты всегда сможешь найти их в приложении бота. Увидимся на шоу!"
