@@ -66,10 +66,12 @@ const handleWebhook = async (req, res) => {
             };
             const dbUser = (await dataService.getDocumentByQuery('user', { userId: tickets[0].userId })) || {};
             const source = dbUser?.source || '';
+            const sources = dbUser?.sources || [];
+            const notifySources = [...new Set([source, sources[sources.length - 1]].filter(Boolean))].join('/')
             const { user } = dbUser;
             const userLink = `<a href="https://t.me/${user.username}">${user.first_name || user.username || 'Пользователь'}</a>`;
-            const info = `${userLink} купил:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\n От ' + source : ''}`
-            text = `Подтверждена оплата от ${userLink} за:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\n От ' + source : ''}`
+            const info = `${userLink} купил:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${notifySources ? '\n От ' + notifySources : ''}`
+            text = `Подтверждена оплата от ${userLink} за:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${tickets[0].currency === 'VND' ? '.000 VND' : tickets[0].currency === 'RUB' ? ' руб' : ' USDT'}${notifySources ? '\n От ' + notifySources : ''}`
             for (const notify of config.salesNotifications) {
               await axios.post(`${config.tgApiUrl}/sendMessage`, {
                 chat_id: notify,
@@ -94,7 +96,7 @@ const handleWebhook = async (req, res) => {
           }
           case 'WRONG': {
             const tickets = await dataService.getDocuments('ticket', { bookingId: value });
-            if(tickets.length){
+            if (tickets.length) {
               await axios.post(`${config.tgApiUrl}/sendMessage`, {
                 chat_id: tickets[0].userId,
                 text: "Что-то не сошлось по сумме. Напишите сообщение, чтобы уточнить детали",

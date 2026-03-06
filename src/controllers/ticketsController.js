@@ -24,7 +24,8 @@ const buyTickets = async (req, res) => {
     }
     const bookingId = crypto.randomBytes(10).toString('base64url');
     const tickets = ticketsString ? JSON.parse(ticketsString) : [];
-    const dbUser = await dataService.getDocumentByQuery('user', { userId: user.id })
+    const dbUser = await dataService.getDocumentByQuery('user', { userId: user.id });
+    const sources = dbUser?.sources || [];
     const newTickets = tickets.map(ticket => ({
       userId: user.id,
       event: ticket.eventId,
@@ -37,7 +38,9 @@ const buyTickets = async (req, res) => {
       confirmed: false,
       add: ticket.add,
       combo: ticket.combo,
-      source: ticket.source || (dbUser?.path ?? []).join('-') || '',
+      source: ticket.source || dbUser?.source || '',
+      lastSource: sources[sources.length - 1] || '',
+      path: dbUser?.path ?? [],
       sent: false,
       _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000),
       discount: ticket.discount,
@@ -60,7 +63,8 @@ const buyTickets = async (req, res) => {
       ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
     };
     const source = dbUser?.source || '';
-    form.append('caption', `Оплата от ${userLink} за билеты:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\nОт ' + source : ''}`);
+    const notifySources = [...new Set([source, sources[sources.length - 1]].filter(Boolean))].join('/')
+    form.append('caption', `Оплата от ${userLink} за билеты:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${notifySources ? '\nОт ' + notifySources : ''}`);
     form.append('reply_markup', JSON.stringify({
       inline_keyboard: [
         [{ text: "Подтвердить", callback_data: `CONFIRM_SPLIT_${bookingId}` }],
@@ -94,6 +98,7 @@ const sellTickets = async (req, res) => {
     const bookingId = crypto.randomBytes(10).toString('base64url');
     const dbUser = await dataService.getDocumentByQuery('user', { userId })
     const fakeUser = userId === 555;
+    const sources = dbUser?.sources || [];
     const newTickets = tickets.map(ticket => ({
       userId,
       event: ticket.eventId,
@@ -106,7 +111,10 @@ const sellTickets = async (req, res) => {
       confirmed: true,
       add: ticket.add,
       combo: ticket.combo,
-      source: (fakeUser ? "" : (dbUser?.path ?? []).join("-")) + `:${[dbCashierUser.first_name, dbCashierUser.last_name].filter(Boolean).join(' ')}${dbCashierUser.username ? "(" + dbCashierUser.username + ")" : ""}`,
+      source: fakeUser ? "" : dbUser?.source || '' ,
+      lastSource: fakeUser ? "" : sources[sources.length - 1] || '',
+      path: fakeUser ? [] : dbUser?.path ?? [],
+      
       sent: false,
       _created: utils.getDate(Date.now() + 7 * 60 * 60 * 1000),
       discount: ticket.discount,
@@ -121,9 +129,11 @@ const sellTickets = async (req, res) => {
       const event = await eventsService.getEventFromCache(ticket.eventId);
       ticketStrings.push(`${citiesService.citiesMap.get(event.city).name} ${event.date} ${config.eventTypes[event.type]} - ${config.ticketTypes[ticket.type]}`)
     };
-    const source = fakeUser ? newTickets[0]?.source : dbUser?.source || '';
+    const source = fakeUser ? "" : dbUser?.source || '';
+    const notifySources = [...new Set([source, sources[sources.length - 1]].filter(Boolean))].join('/')
     const userLink = `<a href="https://t.me/${dbUser?.user?.username}">${dbUser?.user?.first_name || dbUser?.user?.username || 'Пользователь'}</a>`;
-    const info = `${userLink} купил:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${source ? '\nОт ' + source : ''}`
+    const cashierLink = `<a href="https://t.me/${dbCashierUser.username}">${dbCashierUser.first_name || dbCashierUser.username || 'Пользователь'}</a>`;
+    const info = `${cashierLink} продал ${userLink}:\n${ticketStrings.join(',\n')}.\nНа общую сумму ${total}${currency === 'VND' ? '.000 VND' : currency === 'RUB' ? ' руб' : ' USDT'}${notifySources ? '\nОт ' + notifySources : ''}`
     for (const notify of config.salesNotifications) {
       await axios.post(`${config.tgApiUrl}/sendMessage`, {
         chat_id: notify,
