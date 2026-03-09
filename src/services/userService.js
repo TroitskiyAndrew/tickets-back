@@ -4,7 +4,8 @@ const utils = require("../services/utils");
 
 async function handleUser(user, options) {
     try {
-    const { city, pressedStart, source, sessionId, event, pathPoint } = options;
+    let { city, pressedStart, source, sessionId, event, pathPoint } = options;
+    source = source === 'tour' ? '@sverlovsk' : source;
     let dbUser;
     let save = false;
     if (user) {
