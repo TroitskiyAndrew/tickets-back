@@ -42,6 +42,7 @@ async function sendTickets(query, options = {}) {
             if (add) {
                 caption += `. В билет входит ${add}`
             }
+            caption += `. Сбор гостей - ${event.start}, Старт шоу - ${event.start.slice(0,3)}:30`
             form.append('caption', caption);
 
             await axios.post(`${config.tgApiUrl}/sendPhoto`, form);
