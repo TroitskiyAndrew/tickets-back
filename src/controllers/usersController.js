@@ -81,7 +81,7 @@ const sendMessage = async (req, res) => {
     const aggregation = [
   {
     $match: {
-      visits: "6984920943c748577e5f8705"
+      visits: "698491fa43c748577e5f8703"
     }
   },
   {
@@ -91,7 +91,6 @@ const sendMessage = async (req, res) => {
       pipeline: [
         {
           $match: {
-            event: "6985e0b63677bfc5bc8757c6",
             $expr: {
               $eq: ["$userId", "$$uid"]
             }
@@ -108,27 +107,26 @@ const sendMessage = async (req, res) => {
     }
   }
 ]
-
-    const users = await dataService.aggregate('user', aggregation)
+    const users = await dataService.aggregate('user',aggregation)
     const ids = users.map(user => user.userId).filter(id => id !== 140779820);
     console.log('ids', ids.length)
     const success = [];
     const fail = [];
     const mapLink = `<a href="https://www.instagram.com/sverlovsk">@sverlovsk</a>`;
-    for (const id of [andrei]) {
+    for (const id of ids) {
       try {
-        await axios.post(`${config.tgApiUrl}/sendVideo`, {
+        await axios.post(`${config.tgApiUrl}/sendPhoto`, {
           chat_id: id,
           parse_mode: 'HTML',
-          video: 'https://dl.dropboxusercontent.com/scl/fi/2cjt7dj8scrwty007yjoh/compressed.mp4?rlkey=cwfx8yuxbj8qu03wqiamxosf4&dl=1',
-          caption: `Не пропусти! Сегозня последнее шоу на Фукуоке!\nСтендап-импровизация с залом, где Дмитрий по желанию вызывает зрителей на сцену,\nобщается с ними и создает юморитическое шоу прямо у вас на глазах`,
-          reply_markup: {
-            inline_keyboard: [
-              [
-                { text: "Билеты со скидкой 20%", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_FUKUOK-LAST-CALL-DISCOUNT_SEP_EVENT_SPLIT_6985e0b63677bfc5bc8757c6_SEP_DISCOUNT_SPLIT_6985e0b63677bfc5bc8757c6_D_FUKUOK-LAST-CALL' },
-              ]
-            ]
-          },
+          photo: 'https://www.dropbox.com/scl/fi/pm27zzaz53sdm9g5w8soq/photo_2026-03-18_14-03-35.jpg?rlkey=vvvj2fcarpa8ltrc3xcotew0v&raw=1',
+          caption: `Это я смотрю на вас, как вы думаете, брать билеты или нет.\nОбращайтесь к моему организатору @s_gruzdova, у нее для вас скидка на билет аж 30%! Жду всех на шоу.`,
+          // reply_markup: {
+          //   inline_keyboard: [
+          //     [
+          //       { text: "Билеты со скидкой 20%", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_FUKUOK-LAST-CALL-DISCOUNT_SEP_EVENT_SPLIT_6985e0b63677bfc5bc8757c6_SEP_DISCOUNT_SPLIT_6985e0b63677bfc5bc8757c6_D_FUKUOK-LAST-CALL' },
+          //     ]
+          //   ]
+          // },
         });
         console.log('sent to ', id)
         success.push(id)
@@ -139,7 +137,8 @@ const sendMessage = async (req, res) => {
       }
     }
     console.log('success', success.length)
-    console.log('fail', fail.length)
+    console.log('fail', fail.length);
+    // await ticketsService.sendTickets({ bookingId: 'gKME1wlM5-pHew' })
 
     res.status(200).send(true);
     return;
