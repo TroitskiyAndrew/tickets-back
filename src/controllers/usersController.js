@@ -79,51 +79,55 @@ const sendMessage = async (req, res) => {
     const andrei = 480144364
 
     const aggregation = [
-  {
-    $match: {
-      visits: "698491fa43c748577e5f8703"
-    }
-  },
-  {
-    $lookup: {
-      from: "ticket",
-      let: { uid: "$userId" },
-      pipeline: [
-        {
-          $match: {
-            $expr: {
-              $eq: ["$userId", "$$uid"]
-            }
-          }
-        },
-        { $limit: 1 }
-      ],
-      as: "ticketMatch"
-    }
-  },
-  {
-    $match: {
-      ticketMatch: { $eq: [] }
-    }
-  }
-]
-    const users = await dataService.aggregate('user',aggregation)
+      {
+        $lookup: {
+          from: "ticket",
+          let: { uid: "$userId" },
+          pipeline: [
+            {
+              $match: {
+                event: "6985e0b53677bfc5bc8757c1",
+                $expr: {
+                  $eq: ["$userId", "$$uid"]
+                }
+              }
+            },
+            { $limit: 1 }
+          ],
+          as: "ticketMatch"
+        }
+      },
+      {
+        $match: {
+          "ticketMatch.0": { $exists: true }
+        }
+      }
+    ]
+    // const users = await dataService.aggregate('user', aggregation)
+    const users = await dataService.getDocuments('user', { userId: { $ne: 0 } })
     const ids = users.map(user => user.userId).filter(id => id !== 140779820);
     console.log('ids', ids.length)
     const success = [];
     const fail = [];
     const mapLink = `<a href="https://www.instagram.com/sverlovsk">@sverlovsk</a>`;
-    for (const id of ids) {
+    for (const id of [andrei]) {
       try {
-        await axios.post(`${config.tgApiUrl}/sendPhoto`, {
+        await axios.post(`${config.tgApiUrl}/sendVideo`, {
           chat_id: id,
           parse_mode: 'HTML',
-          photo: 'https://www.dropbox.com/scl/fi/pm27zzaz53sdm9g5w8soq/photo_2026-03-18_14-03-35.jpg?rlkey=vvvj2fcarpa8ltrc3xcotew0v&raw=1',
-          caption: `Это я смотрю на вас, как вы думаете, брать билеты или нет.\nОбращайтесь к моему организатору @s_gruzdova, у нее для вас скидка на билет аж 30%! Жду всех на шоу.`,
+          video: 'https://dl.dropboxusercontent.com/scl/fi/qkc7ox5smomgyb2cest8d/hoshimin_2.mp4?rlkey=xg7ispr0j735u4uysgtobiml5&dl=1',
+          caption: `Хошимин, встречай!
+Дима Сверлов в пути.
+Увидимся 27 и 28 на шоу Стендап концерт, а 29 на шоу Стендап-нетворкинг.
+
+Выбирай дату, бронируй заранее. Заходи в бот и выбирай места.
+
+На входе 100% будет дороже.
+Приобретай заранее, пиши @s_gruzdova, она поможет`,
           // reply_markup: {
           //   inline_keyboard: [
           //     [
-          //       { text: "Билеты со скидкой 20%", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_FUKUOK-LAST-CALL-DISCOUNT_SEP_EVENT_SPLIT_6985e0b63677bfc5bc8757c6_SEP_DISCOUNT_SPLIT_6985e0b63677bfc5bc8757c6_D_FUKUOK-LAST-CALL' },
+          //       { text: "Билеты со скидкой 30%", url: 'https://t.me/sverlov_vietnam_2026_bot?startapp=SOURCE_SPLIT_CONCERT-VUNGTAU_SEP_EVENT_SPLIT_69959c523510f226fed2e819_SEP_DISCOUNT_SPLIT_69959c523510f226fed2e819_D_CONCERT-VUNGTAU' },
           //     ]
           //   ]
           // },
@@ -132,7 +136,7 @@ const sendMessage = async (req, res) => {
         success.push(id)
 
       } catch (error) {
-        console.log(error)
+        // console.log(error)
         fail.push(id)
       }
     }
