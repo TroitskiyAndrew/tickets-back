@@ -51,7 +51,7 @@ async function sendTickets(query, options = {}) {
         return true;
 
     } catch (error) {
-        console.log(error)
+        console.log('__sendTickets__error__',error.message)
         return false
     }
 }
